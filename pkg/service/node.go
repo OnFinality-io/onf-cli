@@ -53,3 +53,37 @@ func GetNodeDetail(wsID, nodeID int64) (*Node, error) {
 	resp, d, errs := instance.Request(api.MethodGet, path, nil).EndStruct(&node)
 	return &node, checkError(resp, d, errs)
 }
+
+func StopNode(wsID, nodeID int64) error {
+	path := fmt.Sprintf("/workspaces/%d/nodes/%d/stop", wsID, nodeID)
+	resp, d, errs := instance.Request(api.MethodPost, path, nil).End()
+	return checkError(resp, []byte(d), errs)
+}
+
+func ResumeNode(wsID, nodeID int64) error {
+	path := fmt.Sprintf("/workspaces/%d/nodes/%d/resume", wsID, nodeID)
+	resp, d, errs := instance.Request(api.MethodPost, path, nil).End()
+	return checkError(resp, []byte(d), errs)
+}
+
+func TerminateNode(wsID, nodeID int64) error {
+	path := fmt.Sprintf("/workspaces/%d/nodes/%d", wsID, nodeID)
+	resp, d, errs := instance.Request(api.MethodDelete, path, nil).End()
+	return checkError(resp, []byte(d), errs)
+}
+
+func UpdateNode(wsID, nodeID int64, data interface{}) error {
+	path := fmt.Sprintf("/workspaces/%d/nodes/%d", wsID, nodeID)
+	resp, d, errs := instance.Request(api.MethodPut, path, &api.RequestOptions{
+		Body: data,
+	}).End()
+	return checkError(resp, []byte(d), errs)
+}
+
+func CreateNode(wsID, data interface{}) error {
+	path := fmt.Sprintf("/workspaces/%d/nodes", wsID)
+	resp, d, errs := instance.Request(api.MethodPost, path, &api.RequestOptions{
+		Body: data,
+	}).End()
+	return checkError(resp, []byte(d), errs)
+}

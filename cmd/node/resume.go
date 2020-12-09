@@ -6,17 +6,17 @@ import (
 	"github.com/spf13/cobra"
 )
 
-func stopCmd() *cobra.Command {
+func resumeCmd() *cobra.Command {
 	c := &cobra.Command{
-		Use:   "stop",
-		Short: "stop a running node",
+		Use:   "resume",
+		Short: "resume a stopped node",
 		Run: func(cmd *cobra.Command, args []string) {
-			err := service.StopNode(wsID, nodeID)
+			err := service.ResumeNode(wsID, nodeID)
 			if err != nil {
 				fmt.Println(err.Error())
 				return
 			}
-			fmt.Println("node", nodeID, "is stopped")
+			fmt.Println("node", nodeID, "is resumed")
 		},
 	}
 	c.Flags().Int64VarP(&nodeID, "node", "n", 0, "node id")
