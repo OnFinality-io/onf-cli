@@ -2,16 +2,20 @@ package node
 
 import "github.com/spf13/cobra"
 
+var wsID int64
+var nodeID int64
+
 func New() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "node",
 		Short: "manage dedicated nodes in the OnFinality platform",
 	}
-	var workspaceId string
-	cmd.PersistentFlags().StringVarP(&workspaceId, "workspace", "w", "", "Workspace ID (required)")
-	//_ = cmd.MarkPersistentFlagRequired("workspace")
+	cmd.PersistentFlags().Int64VarP(&wsID, "workspace", "w", 0, "Workspace ID (required)")
+	_ = cmd.MarkPersistentFlagRequired("workspace")
+
 	cmd.AddCommand(
 		listCmd(),
+		showCmd(),
 	)
 	return cmd
 }

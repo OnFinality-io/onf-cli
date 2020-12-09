@@ -27,8 +27,8 @@ type Api struct {
 }
 
 func New(accessKey, secretKey string) *Api {
-	//baseURL := "https://api.onfinality.me/api/v1"
-	baseURL := "http://localhost:5000/api/v1"
+	baseURL := "https://api.onfinality.me/api/v1"
+	//baseURL := "http://localhost:5000/api/v1"
 	req := gorequest.New()
 	req.Header.Set("content-type", "application/json")
 	req.Header.Set("x-onf-client", viper.GetString("app.name"))
