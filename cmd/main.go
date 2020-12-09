@@ -52,8 +52,12 @@ func main() {
 	rootCmd.PersistentFlags().StringVarP(&profile, "profile", "p", "default", "profile scope in the credentials file")
 
 	rootCmd.AddCommand(
-		node.New(),
+		VersionCmd(),
+
 		workspace.ListCmd(),
+		workspace.MemberCmd(),
+
+		node.New(),
 	)
 	if err := rootCmd.Execute(); err != nil {
 		log.Fatal(err)
