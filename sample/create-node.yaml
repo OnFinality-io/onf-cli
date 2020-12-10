@@ -1,0 +1,7 @@
+nodeName: cli-test
+clusterKey: sy
+nodeSpecKey: medium
+networkSpecKey: kusama
+initFromBackup: true
+publicPort: true
+useApiKey: true

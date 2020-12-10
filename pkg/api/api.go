@@ -42,7 +42,7 @@ func New(accessKey, secretKey string) *Api {
 }
 
 type RequestOptions struct {
-	Params *map[string]string
+	Params map[string]string
 	Body   interface{}
 }
 
@@ -54,13 +54,13 @@ func (a *Api) Request(method Method, path string, opts *RequestOptions) *goreque
 
 	if opts != nil {
 		if opts.Params != nil {
-			for k, v := range *opts.Params {
+			for k, v := range opts.Params {
 				u.Query().Add(k, v)
 			}
 		}
 		if opts.Body != nil {
-			r.Header.Set("content-md5", contentChecksum(opts.Body))
 			r = r.Send(opts.Body)
+			r.Header.Set("content-md5", contentChecksum(r.Data))
 		}
 	}
 
