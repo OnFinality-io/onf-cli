@@ -58,6 +58,8 @@ func main() {
 
 		workspace.ListCmd(),
 		workspace.MemberCmd(),
+		workspace.InviteCmd(),
+
 		node.New(),
 		info.NewCmd(),
 	)
