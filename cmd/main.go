@@ -3,14 +3,16 @@ package main
 import (
 	"errors"
 	"fmt"
+	"log"
+	"path"
+
+	"github.com/OnFinality-io/onf-cli/cmd/info"
 	"github.com/OnFinality-io/onf-cli/cmd/node"
 	"github.com/OnFinality-io/onf-cli/cmd/workspace"
 	"github.com/OnFinality-io/onf-cli/pkg/service"
 	"github.com/mitchellh/go-homedir"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
-	"log"
-	"path"
 )
 
 var profile string
@@ -56,8 +58,8 @@ func main() {
 
 		workspace.ListCmd(),
 		workspace.MemberCmd(),
-
 		node.New(),
+		info.NewCmd(),
 	)
 	if err := rootCmd.Execute(); err != nil {
 		log.Fatal(err)
