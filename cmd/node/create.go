@@ -20,23 +20,7 @@ func createCmd() *cobra.Command {
 		Run: func(cmd *cobra.Command, args []string) {
 			payload := &service.CreateNodePayload{}
 			if filePath != "" {
-				ext := filepath.Ext(filePath)
-				if !utils.Contains([]string{".json", ".yaml", ".yml"}, ext) {
-					fmt.Println("Error: definition file must be in JSON and YAML format")
-					return
-				}
-				data, err := ioutil.ReadFile(filePath)
-				if err != nil {
-					fmt.Println("Error: Failed to read file", filePath)
-					return
-				}
-				if ext == ".json" {
-					err = json.Unmarshal(data, payload)
-				} else {
-					err = yaml.Unmarshal(data, payload)
-				}
-				if err != nil {
-					fmt.Println("Error: Invalid definition file", filePath)
+				if applyDefinitionFile(filePath, payload) {
 					return
 				}
 			}
@@ -51,4 +35,27 @@ func createCmd() *cobra.Command {
 	}
 	c.Flags().StringVarP(&filePath, "file", "f", "", "definition file for create node, yaml or json")
 	return c
+}
+
+func applyDefinitionFile(file string, payload interface{}) bool {
+	ext := filepath.Ext(file)
+	if !utils.Contains([]string{".json", ".yaml", ".yml"}, ext) {
+		fmt.Println("Error: definition file must be in JSON and YAML format")
+		return true
+	}
+	data, err := ioutil.ReadFile(filePath)
+	if err != nil {
+		fmt.Println("Error: Failed to read file", filePath)
+		return true
+	}
+	if ext == ".json" {
+		err = json.Unmarshal(data, payload)
+	} else {
+		err = yaml.Unmarshal(data, payload)
+	}
+	if err != nil {
+		fmt.Println("Error: Invalid definition file", filePath)
+		return true
+	}
+	return false
 }
