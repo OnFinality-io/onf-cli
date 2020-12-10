@@ -59,8 +59,8 @@ func (a *Api) Request(method Method, path string, opts *RequestOptions) *goreque
 			}
 		}
 		if opts.Body != nil {
-			r.Header.Set("content-md5", contentChecksum(opts.Body))
 			r = r.Send(opts.Body)
+			r.Header.Set("content-md5", contentChecksum(r.Data))
 		}
 	}
 

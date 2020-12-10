@@ -40,6 +40,31 @@ type Node struct {
 	HasUpgrade         bool         `json:"hasUpgrade"`
 }
 
+type CreateNodeMetadata struct {
+	NodeKey    *string           `json:"nodeKey"`
+	SkipName   bool              `json:"skipName"`
+	ExtraArgs  []string          `json:"extraArgs"`
+	Client     *string           `json:"client"`
+	RpcMethods *string           `json:"rpcMethods"`
+	Labels     map[string]string `json:"labels"`
+}
+
+type CreateNodePayload struct {
+	NetworkSpecKey string              `json:"networkSpecKey"`
+	NodeSpecKey    *string             `json:"nodeSpecKey"`
+	NodeSpec       *string             `json:"nodeSpec"`
+	NodeType       string              `json:"nodeType"`
+	NodeName       string              `json:"nodeName"`
+	ClusterHash    string              `json:"clusterKey"`
+	Storage        *string             `json:"storage"`
+	InitFromBackup bool                `json:"initFromBackup"`
+	UseApiKey      bool                `json:"useApiKey"`
+	ImageVersion   *string             `json:"imageVersion"`
+	Client         *string             `json:"client"`
+	PublicPort     bool                `json:"publicPort"`
+	Metadata       *CreateNodeMetadata `json:"metadata"`
+}
+
 func GetNodeList(wsID int64) ([]Node, error) {
 	var nodes []Node
 	path := fmt.Sprintf("/workspaces/%d/nodes", wsID)
@@ -80,10 +105,11 @@ func UpdateNode(wsID, nodeID int64, data interface{}) error {
 	return checkError(resp, []byte(d), errs)
 }
 
-func CreateNode(wsID, data interface{}) error {
+func CreateNode(wsID int64, data *CreateNodePayload) (*Node, error) {
 	path := fmt.Sprintf("/workspaces/%d/nodes", wsID)
+	node := &Node{}
 	resp, d, errs := instance.Request(api.MethodPost, path, &api.RequestOptions{
 		Body: data,
-	}).End()
-	return checkError(resp, []byte(d), errs)
+	}).EndStruct(node)
+	return node, checkError(resp, d, errs)
 }
