@@ -2,7 +2,7 @@ package workspace
 
 import (
 	"fmt"
-	"github.com/OnFinality-io/onf-cli/cmd/utils/printer"
+	"github.com/OnFinality-io/onf-cli/pkg/printer"
 	"github.com/OnFinality-io/onf-cli/pkg/service"
 	"github.com/spf13/cobra"
 	"strconv"
