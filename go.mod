@@ -13,5 +13,6 @@ require (
 	github.com/rodaine/table v1.0.1
 	github.com/spf13/cobra v1.1.1
 	github.com/spf13/viper v1.7.0
+	gopkg.in/ini.v1 v1.62.0
 	moul.io/http2curl v1.0.0 // indirect
 )

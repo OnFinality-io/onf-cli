@@ -2,6 +2,7 @@ package info
 
 import (
 	"fmt"
+
 	"github.com/OnFinality-io/onf-cli/pkg/printer"
 
 	"github.com/OnFinality-io/onf-cli/pkg/service"
@@ -11,7 +12,7 @@ import (
 func NodeRecommendsCmd() *cobra.Command {
 	var network string
 	c := &cobra.Command{
-		Use:   "network",
+		Use:   "recommend",
 		Short: "Show recommended node",
 		Run: func(cmd *cobra.Command, args []string) {
 			if network != "" {
@@ -27,7 +28,7 @@ func NodeRecommendsCmd() *cobra.Command {
 		},
 	}
 
-	c.Flags().StringVarP(&network, "name", "n", "", "network name")
+	c.Flags().StringVarP(&network, "network-name", "n", "", "network name")
 	_ = c.MarkFlagRequired("name")
 	return c
 }

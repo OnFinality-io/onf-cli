@@ -46,7 +46,7 @@ type Protocols struct {
 	Key               string    `json:"key" header:"key"`
 	Name              string    `json:"name" header:"name"`
 	Derivable         bool      `json:"derivable" header:"derivable"`
-	ImageRepositories []string  `json:"imageRepositories" header:"imageRepositories"`
+	ImageRepositories []string  `json:"imageRepositories" header:"images"`
 }
 
 type NodeRecommendation struct {
