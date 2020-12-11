@@ -5,13 +5,20 @@ type Endpoints struct {
 	WS          string `json:"ws"`
 	P2pInternal string `json:"p2p-internal"`
 }
+type NodeListItem struct {
+	ID             uint64 `json:"id,string" header:"ID"`
+	Name           string `json:"name" header:"Name"`
+	NetworkSpecKey string `json:"networkSpecKey" header:"Network"`
+	ClusterHash    string `json:"clusterHash" header:"Cluster"`
+	Status         string `json:"status" header:"Status"`
+}
 
 type Node struct {
-	ID                 int64        `json:"id,string"`
-	Name               string       `json:"name"`
-	NetworkSpecKey     string       `json:"networkSpecKey"`
-	WorkspaceID        int64        `json:"workspaceId,string"`
-	OwnerID            int64        `json:"ownerId,string"`
+	ID                 uint64       `json:"id,string" header:"ID"`
+	Name               string       `json:"name" header:"Name"`
+	NetworkSpecKey     string       `json:"networkSpecKey" header:"Network"`
+	WorkspaceID        uint64       `json:"workspaceId,string"`
+	OwnerID            uint64       `json:"ownerId,string"`
 	NodeType           string       `json:"nodeType"`
 	NodeSpec           string       `json:"nodeSpec"`
 	CPU                string       `json:"cpu"`
@@ -20,8 +27,8 @@ type Node struct {
 	Storage            string       `json:"storage"`
 	StorageType        string       `json:"storageType"`
 	Image              string       `json:"image"`
-	ClusterHash        string       `json:"clusterHash"`
-	Status             string       `json:"status"`
+	ClusterHash        string       `json:"clusterHash" header:"Cluster"`
+	Status             string       `json:"status" header:"Status"`
 	Metadata           NodeMetadata `json:"metadata"`
 	NetworkSpec        *NetworkSpec `json:"networkSpec"`
 	Endpoints          *Endpoints   `json:"endpoints"`

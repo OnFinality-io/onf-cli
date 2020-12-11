@@ -11,7 +11,7 @@ type NetworkSpec struct {
 	ProtocolKey     string              `json:"protocolKey"`
 	IsSystem        bool                `json:"isSystem"`
 	ImageRepository string              `json:"imageRepository"`
-	WorkspaceID     int64               `json:"workspaceId,string"`
+	WorkspaceID     uint64              `json:"workspaceId,string"`
 	Status          string              `json:"status"`
 	Metadata        NetworkSpecMetadata `json:"metadata"`
 }

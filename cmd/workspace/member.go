@@ -2,6 +2,7 @@ package workspace
 
 import (
 	"fmt"
+	"github.com/OnFinality-io/onf-cli/cmd/helpers"
 	"github.com/OnFinality-io/onf-cli/pkg/printer"
 	"github.com/OnFinality-io/onf-cli/pkg/service"
 	"github.com/spf13/cobra"
@@ -23,6 +24,12 @@ func MemberCmd() *cobra.Command {
 		Use:   "members",
 		Short: "list all members in a given workspace",
 		Run: func(cmd *cobra.Command, args []string) {
+			wsID, err := helpers.GetWorkspaceID(cmd)
+			if err != nil {
+				fmt.Println(err.Error())
+				return
+			}
+
 			var members []service.Member
 			var invites []service.InviteLog
 			wg := sync.WaitGroup{}
@@ -56,7 +63,7 @@ func MemberCmd() *cobra.Command {
 			var view []memberView
 			for _, m := range members {
 				view = append(view, memberView{
-					ID:     strconv.FormatInt(m.ID, 10),
+					ID:     strconv.FormatUint(m.ID, 10),
 					Name:   m.Name,
 					Email:  m.Email,
 					Role:   m.Role,
@@ -76,6 +83,5 @@ func MemberCmd() *cobra.Command {
 		},
 	}
 	c.Flags().Int64VarP(&wsID, "workspace", "w", 0, "workspace id")
-	_ = c.MarkFlagRequired("workspace")
 	return c
 }

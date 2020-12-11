@@ -2,6 +2,7 @@ package node
 
 import (
 	"fmt"
+	"github.com/OnFinality-io/onf-cli/cmd/helpers"
 	"github.com/OnFinality-io/onf-cli/pkg/service"
 	"github.com/spf13/cobra"
 )
@@ -11,7 +12,12 @@ func resumeCmd() *cobra.Command {
 		Use:   "resume",
 		Short: "resume a stopped node",
 		Run: func(cmd *cobra.Command, args []string) {
-			err := service.ResumeNode(wsID, nodeID)
+			wsID, err := helpers.GetWorkspaceID(cmd)
+			if err != nil {
+				fmt.Println(err.Error())
+				return
+			}
+			err = service.ResumeNode(wsID, nodeID)
 			if err != nil {
 				fmt.Println(err.Error())
 				return

@@ -7,10 +7,10 @@ import (
 )
 
 type Workspace struct {
-	ID              int64      `json:"id,string"`
-	Name            string     `json:"name"`
-	Plan            string     `json:"plan"`
-	OwnerID         int64      `json:"ownerId,string"`
+	ID              uint64     `json:"id,string" header:"ID"`
+	Name            string     `json:"name" header:"Name"`
+	Plan            string     `json:"plan" header:"Plan"`
+	OwnerID         uint64     `json:"ownerId,string"`
 	BillingType     string     `json:"billingType"`
 	PaymentMethodID string     `json:"paymentMethodId"`
 	Active          bool       `json:"active"`
@@ -20,14 +20,14 @@ type Workspace struct {
 }
 
 type Member struct {
-	ID    int64  `json:"id,string"`
+	ID    uint64 `json:"id,string"`
 	Name  string `json:"name"`
 	Email string `json:"email"`
 	Role  string `json:"role"`
 }
 
 type InviteLog struct {
-	ID     int64  `json:"id,string"`
+	ID     uint64 `json:"id,string"`
 	Email  string `json:"email"`
 	Role   string `json:"role"`
 	IsDone bool   `json:"isDone"`

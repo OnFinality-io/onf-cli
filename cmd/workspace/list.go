@@ -2,8 +2,8 @@ package workspace
 
 import (
 	"fmt"
+	"github.com/OnFinality-io/onf-cli/pkg/printer"
 	"github.com/OnFinality-io/onf-cli/pkg/service"
-	"github.com/rodaine/table"
 	"github.com/spf13/cobra"
 )
 
@@ -17,11 +17,7 @@ func ListCmd() *cobra.Command {
 				fmt.Println(err.Error())
 				return
 			}
-			t := table.New("ID", "Name", "Plan")
-			for _, row := range list {
-				t.AddRow(row.ID, row.Name, row.Plan)
-			}
-			t.Print()
+			printer.New().Print(list)
 		},
 	}
 }

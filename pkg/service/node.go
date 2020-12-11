@@ -5,8 +5,8 @@ import (
 	"github.com/OnFinality-io/onf-cli/pkg/api"
 )
 
-func GetNodeList(wsID int64) ([]Node, error) {
-	var nodes []Node
+func GetNodeList(wsID int64) ([]NodeListItem, error) {
+	var nodes []NodeListItem
 	path := fmt.Sprintf("/workspaces/%d/nodes", wsID)
 	resp, d, errs := instance.Request(api.MethodGet, path, nil).EndStruct(&nodes)
 	return nodes, checkError(resp, d, errs)

@@ -2,6 +2,7 @@ package workspace
 
 import (
 	"fmt"
+	"github.com/OnFinality-io/onf-cli/cmd/helpers"
 	"github.com/OnFinality-io/onf-cli/pkg/service"
 	"github.com/spf13/cobra"
 )
@@ -15,11 +16,16 @@ func InviteCmd() *cobra.Command {
 		Use:   "invite",
 		Short: "invite a new member to join the workspace",
 		Run: func(cmd *cobra.Command, args []string) {
+			wsID, err := helpers.GetWorkspaceID(cmd)
+			if err != nil {
+				fmt.Println(err.Error())
+				return
+			}
 			if len(args) == 0 {
 				fmt.Println("Error: Please give the user email address")
 				return
 			}
-			err := service.InviteMember(wsID, &service.InviteMemberPayload{
+			err = service.InviteMember(wsID, &service.InviteMemberPayload{
 				Email: email,
 				Role:  userRole,
 			})
@@ -31,7 +37,6 @@ func InviteCmd() *cobra.Command {
 		},
 	}
 	c.Flags().Int64VarP(&wsID, "workspace", "w", 0, "workspace id")
-	_ = c.MarkFlagRequired("workspace")
 	c.Flags().StringVarP(&email, "email", "e", "", "email address")
 	_ = c.MarkFlagRequired("email")
 	c.Flags().StringVarP(&userRole, "role", "r", "member", "user role")

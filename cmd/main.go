@@ -19,7 +19,6 @@ var profile string
 
 func init() {
 	loadConfig()
-
 }
 
 func loadConfig() {
@@ -32,9 +31,6 @@ func loadConfig() {
 	if err != nil {
 		log.Fatal(err)
 	}
-
-	viper.SetDefault("app.name", "onf-cli")
-	viper.SetDefault("app.version", "1.0.0")
 }
 
 func main() {
