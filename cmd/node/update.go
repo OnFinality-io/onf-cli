@@ -19,7 +19,9 @@ func updateCmd() *cobra.Command {
 			}
 			payload := &service.UpdateNodePayload{}
 			if filePath != "" {
-				if applyDefinitionFile(filePath, payload) {
+				err = helpers.ApplyDefinitionFile(filePath, payload)
+				if err != nil {
+					fmt.Println(err.Error())
 					return
 				}
 			}
