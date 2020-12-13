@@ -11,23 +11,66 @@ import (
 )
 
 const (
-	defaultDir          = ".onf"
-	credentials         = "credentials"
-	credentialsFileType = "ini"
+	defaultOnfDir              = ".onf"
+	defaultCredentialFileName  = "credentials"
+	defaultCredentialsFileType = "ini"
 )
 
 type CredentialConfig struct {
-	Credential *Credential
 	Section    string
+	Credential *Credential
 }
 
 type Credential struct {
-	AccessKey string `ini:"onf_access_key"`
-	SecretKey string `ini:"onf_secret_key"`
+	AccessKey   string `ini:"onf_access_key"`
+	SecretKey   string `ini:"onf_secret_key"`
+	WorkspaceID uint64 `ini:"onf_workspace_id"`
 }
 
-func CreateHomeDir(homeDir, defaultDir string) (onfHomeDir string) {
-	onfHomeDir = filepath.Join(homeDir, defaultDir)
+type CredentialFile struct {
+	CredentialFileName  string
+	CredentialsFileType string
+}
+
+func (cf *CredentialFile) GenerateFilePath(onfHomeDir string) (onfCredentialFile string) {
+	if cf.CredentialFileName == "" {
+		cf.CredentialFileName = defaultCredentialFileName
+	}
+	if cf.CredentialsFileType == "" {
+		cf.CredentialsFileType = defaultCredentialsFileType
+	}
+	onfCredentialFile = filepath.Join(onfHomeDir, cf.CredentialFileName+"."+cf.CredentialsFileType)
+	return onfCredentialFile
+}
+
+func (cf *CredentialFile) CreateCredentialFileAt(onfHomeDir string) (onfCredentialFile string, err error) {
+	onfCredentialFile = cf.GenerateFilePath(onfHomeDir)
+	if exist, err := utils.Exists(onfCredentialFile); err == nil && exist {
+	} else {
+		err := utils.Touch(onfCredentialFile)
+		if err != nil {
+			return onfCredentialFile, err
+		}
+	}
+	return onfCredentialFile, nil
+}
+func (cf *CredentialFile) IsExistAtOnfAtHomeDir() bool {
+	homeDir, err := os.UserHomeDir()
+	if err == nil {
+		onfHomeDir := CreateHomeDir(homeDir, defaultOnfDir)
+		onfCredentialFile := cf.GenerateFilePath(onfHomeDir)
+		if exist, err := utils.Exists(onfCredentialFile); err == nil && exist {
+			return true
+		} else {
+			return false
+		}
+	} else {
+		return false
+	}
+}
+
+func CreateHomeDir(sysHomeDir, defaultDir string) (onfHomeDir string) {
+	onfHomeDir = filepath.Join(sysHomeDir, defaultDir)
 	if exist, err := utils.Exists(onfHomeDir); err == nil && exist {
 
 	} else {
@@ -40,52 +83,34 @@ func CreateHomeDir(homeDir, defaultDir string) (onfHomeDir string) {
 	}
 	return onfHomeDir
 }
-
-func CreateCredentialFile(onfHomeDir string) (onfCredentialFile string) {
-	onfCredentialFile = filepath.Join(onfHomeDir, credentials+"."+credentialsFileType)
-	if exist, err := utils.Exists(onfCredentialFile); err == nil && exist {
-	} else {
-		err := utils.Touch(onfCredentialFile)
-		if err != nil {
-			fmt.Println("Fail to create onf config file at " + onfHomeDir)
-			return onfCredentialFile
-		}
-		fmt.Println("create " + onfCredentialFile + " success")
-	}
-	return onfCredentialFile
-}
-
 func New(credential *CredentialConfig) {
 	homeDir, err := os.UserHomeDir()
 	if err == nil {
-		onfHomeDir := CreateHomeDir(homeDir, defaultDir)
-		onfCredentialFile := CreateCredentialFile(onfHomeDir)
-		cfg, err := ini.Load(onfCredentialFile)
-		if err != nil {
-			fmt.Printf("Fail to read file: %v", err)
-		} else {
-			if credential.Section == "" {
-				cfg.ReflectFrom(credential.Credential)
+		onfHomeDir := CreateHomeDir(homeDir, defaultOnfDir)
+		credentialFile := &CredentialFile{}
+		onfCredentialFile, err := credentialFile.CreateCredentialFileAt(onfHomeDir)
+		if err == nil {
+			fmt.Println("create " + onfCredentialFile + " success")
+			cfg, err := ini.Load(onfCredentialFile)
+			if err != nil {
+				fmt.Printf("Fail to read file: %v", err)
 			} else {
-				section, err := cfg.NewSection(credential.Section)
+				if credential.Section == "" {
+					cfg.ReflectFrom(credential.Credential)
+				} else {
+					section, err := cfg.NewSection(credential.Section)
+					if err != nil {
+						fmt.Printf("Fail to save file: %v", err)
+					}
+					section.ReflectFrom(credential.Credential)
+				}
+				cfg.SaveTo(onfCredentialFile)
 				if err != nil {
 					fmt.Printf("Fail to save file: %v", err)
 				}
-				section.ReflectFrom(credential.Credential)
 			}
-			cfg.SaveTo(onfCredentialFile)
-			if err != nil {
-				fmt.Printf("Fail to save file: %v", err)
-			}
+		} else {
+			fmt.Println("Fail to create onf config file at " + onfHomeDir)
 		}
-
-	}
-}
-
-func IsCreated(onfCredentialFile string) bool {
-	if exist, err := utils.Exists(onfCredentialFile); err == nil && exist {
-		return true
-	} else {
-		return false
 	}
 }

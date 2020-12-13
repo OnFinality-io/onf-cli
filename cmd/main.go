@@ -9,6 +9,7 @@ import (
 
 	"github.com/OnFinality-io/onf-cli/cmd/info"
 	"github.com/OnFinality-io/onf-cli/cmd/node"
+	"github.com/OnFinality-io/onf-cli/cmd/setup"
 	"github.com/OnFinality-io/onf-cli/cmd/workspace"
 	"github.com/OnFinality-io/onf-cli/pkg/service"
 	"github.com/mitchellh/go-homedir"
@@ -21,9 +22,15 @@ var version string
 var gitCommit string
 
 func init() {
+	setupInit()
 	loadConfig()
 }
-
+func setupInit() {
+	credentialFile := &setup.CredentialFile{}
+	if !credentialFile.IsExistAtOnfAtHomeDir() {
+		setup.Flow()
+	}
+}
 func loadConfig() {
 	home, _ := homedir.Dir()
 	viper.SetConfigType("ini")
@@ -66,6 +73,7 @@ func main() {
 		node.New(),
 		networkspec.New(),
 		info.NewCmd(),
+		setup.NewCmd(),
 	)
 	if err := rootCmd.Execute(); err != nil {
 		log.Fatal(err)
