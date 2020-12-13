@@ -3,6 +3,7 @@ package main
 import (
 	"errors"
 	"fmt"
+	"github.com/OnFinality-io/onf-cli/cmd/networkspec"
 	"log"
 	"path"
 
@@ -31,6 +32,9 @@ func loadConfig() {
 	if err != nil {
 		log.Fatal(err)
 	}
+
+	viper.SetDefault("app.name", "onf-cli")
+	viper.SetDefault("app.version", "0.1.0")
 }
 
 func main() {
@@ -57,6 +61,7 @@ func main() {
 		workspace.InviteCmd(),
 
 		node.New(),
+		networkspec.New(),
 		info.NewCmd(),
 	)
 	if err := rootCmd.Execute(); err != nil {
