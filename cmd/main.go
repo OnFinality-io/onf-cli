@@ -17,6 +17,8 @@ import (
 )
 
 var profile string
+var version string
+var gitCommit string
 
 func init() {
 	loadConfig()
@@ -34,7 +36,8 @@ func loadConfig() {
 	}
 
 	viper.SetDefault("app.name", "onf-cli")
-	viper.SetDefault("app.version", "0.1.0")
+	viper.SetDefault("app.version", version)
+	viper.SetDefault("git.commit", gitCommit)
 }
 
 func main() {

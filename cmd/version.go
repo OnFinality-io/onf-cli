@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
+	"runtime"
 )
 
 func VersionCmd() *cobra.Command {
@@ -11,7 +12,10 @@ func VersionCmd() *cobra.Command {
 		Use:   "version",
 		Short: "display client version",
 		Run: func(cmd *cobra.Command, args []string) {
-			fmt.Println(fmt.Sprintf("v%s", viper.GetString("app.version")))
+			fmt.Printf("Name: \t\t%s\n", viper.GetString("app.name"))
+			fmt.Printf("Version: \t%s\n", viper.GetString("app.version"))
+			fmt.Printf("Git Commit: \t%s\n", viper.GetString("git.commit"))
+			fmt.Printf("OS/ARCH: \t%s/%s\n", runtime.GOOS, runtime.GOARCH)
 		},
 	}
 }
