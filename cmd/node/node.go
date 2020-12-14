@@ -7,7 +7,7 @@ import (
 var wsID int64
 var nodeID int64
 
-func New() *cobra.Command {
+func NewCmd() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "node",
 		Short: "Manage dedicated nodes in the OnFinality platform",

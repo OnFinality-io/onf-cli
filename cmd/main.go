@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/OnFinality-io/onf-cli/cmd/networkspec"
 	"log"
+	"os"
 	"path"
 
 	"github.com/OnFinality-io/onf-cli/cmd/info"
@@ -21,16 +22,11 @@ var profile string
 var version string
 var gitCommit string
 
-func init() {
-	setupInit()
-	loadConfig()
-}
-func setupInit() {
+func checkSetup() bool {
 	credentialFile := &setup.CredentialFile{}
-	if !credentialFile.IsExistAtOnfAtHomeDir() {
-		setup.Flow()
-	}
+	return credentialFile.IsExistAtOnfAtHomeDir()
 }
+
 func loadConfig() {
 	home, _ := homedir.Dir()
 	viper.SetConfigType("ini")
@@ -48,10 +44,15 @@ func loadConfig() {
 }
 
 func main() {
+	if os.Args[1] != "setup" && !checkSetup() {
+		fmt.Println("please run `onf setup` to initial the configurations")
+		return
+	}
 	rootCmd := &cobra.Command{
 		Use:     "onf",
 		Version: viper.GetString("app.version"),
 		PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
+			loadConfig()
 			accessKey := viper.GetString(fmt.Sprintf("%s.onf_access_key", profile))
 			secretKey := viper.GetString(fmt.Sprintf("%s.onf_secret_key", profile))
 			if accessKey == "" || secretKey == "" {
@@ -70,8 +71,8 @@ func main() {
 		workspace.MemberCmd(),
 		workspace.InviteCmd(),
 
-		node.New(),
-		networkspec.New(),
+		node.NewCmd(),
+		networkspec.NewCmd(),
 		info.NewCmd(),
 		setup.NewCmd(),
 	)

@@ -6,7 +6,7 @@ import (
 
 var wsID int64
 
-func New() *cobra.Command {
+func NewCmd() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "network-spec",
 		Short: "Manage network specs in the OnFinality platform",

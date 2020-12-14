@@ -11,9 +11,14 @@ import (
 func NewCmd() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "setup",
-		Short: "Init config",
+		Short: "initialize the configuration",
+		PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
+			return nil
+		},
+		Run: func(cmd *cobra.Command, args []string) {
+			Flow()
+		},
 	}
-
 	return cmd
 }
 
@@ -43,18 +48,13 @@ func Flow() {
 	}
 	credential.SecretKey = result
 
-	if err != nil {
-		fmt.Println(err.Error())
-		return
-	}
-
 	// workspace id key
 	service.Init(credential.AccessKey, credential.SecretKey)
 	list, err := service.GetWorkspaceList()
 	if len(list) == 1 {
 		credential.WorkspaceID = list[0].ID
 	} else {
-		name := []string{}
+		var name []string
 		for _, ws := range list {
 			name = append(name, ws.Name)
 		}
@@ -62,18 +62,16 @@ func Flow() {
 			Label: "Please select your workspace",
 			Items: name,
 		}
-		index, result, err := workspaceIDPrompt.Run()
+		index, _, err := workspaceIDPrompt.Run()
 		if err != nil {
 			fmt.Printf("Fail to add workspace id %v\n", err)
 			return
 		}
-		fmt.Println(index, result)
 		credential.WorkspaceID = list[index].ID
 	}
 
 	config := &CredentialConfig{
 		Credential: credential,
-		// Section:    "dev",
 	}
-	New(config)
+	PersistentCredential(config)
 }

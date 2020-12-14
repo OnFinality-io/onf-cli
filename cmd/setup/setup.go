@@ -24,7 +24,7 @@ type CredentialConfig struct {
 type Credential struct {
 	AccessKey   string `ini:"onf_access_key"`
 	SecretKey   string `ini:"onf_secret_key"`
-	WorkspaceID uint64 `ini:"onf_workspace_id"`
+	WorkspaceID uint64 `ini:"default_workspace"`
 }
 
 type CredentialFile struct {
@@ -39,7 +39,7 @@ func (cf *CredentialFile) GenerateFilePath(onfHomeDir string) (onfCredentialFile
 	if cf.CredentialsFileType == "" {
 		cf.CredentialsFileType = defaultCredentialsFileType
 	}
-	onfCredentialFile = filepath.Join(onfHomeDir, cf.CredentialFileName+"."+cf.CredentialsFileType)
+	onfCredentialFile = filepath.Join(onfHomeDir, cf.CredentialFileName)
 	return onfCredentialFile
 }
 
@@ -83,7 +83,7 @@ func CreateHomeDir(sysHomeDir, defaultDir string) (onfHomeDir string) {
 	}
 	return onfHomeDir
 }
-func New(credential *CredentialConfig) {
+func PersistentCredential(credential *CredentialConfig) {
 	homeDir, err := os.UserHomeDir()
 	if err == nil {
 		onfHomeDir := CreateHomeDir(homeDir, defaultOnfDir)
