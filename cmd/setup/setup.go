@@ -32,7 +32,7 @@ type CredentialFile struct {
 	CredentialsFileType string
 }
 
-func (cf *CredentialFile) GenerateFilePath(onfHomeDir string) (onfCredentialFile string) {
+func (cf *CredentialFile) GetCredentialPath(onfHomeDir string) (onfCredentialFile string) {
 	if cf.CredentialFileName == "" {
 		cf.CredentialFileName = defaultCredentialFileName
 	}
@@ -44,7 +44,7 @@ func (cf *CredentialFile) GenerateFilePath(onfHomeDir string) (onfCredentialFile
 }
 
 func (cf *CredentialFile) CreateCredentialFileAt(onfHomeDir string) (onfCredentialFile string, err error) {
-	onfCredentialFile = cf.GenerateFilePath(onfHomeDir)
+	onfCredentialFile = cf.GetCredentialPath(onfHomeDir)
 	if exist, err := utils.Exists(onfCredentialFile); err == nil && exist {
 	} else {
 		err := utils.Touch(onfCredentialFile)
@@ -57,8 +57,8 @@ func (cf *CredentialFile) CreateCredentialFileAt(onfHomeDir string) (onfCredenti
 func (cf *CredentialFile) IsExistAtOnfAtHomeDir() bool {
 	homeDir, err := os.UserHomeDir()
 	if err == nil {
-		onfHomeDir := CreateHomeDir(homeDir, defaultOnfDir)
-		onfCredentialFile := cf.GenerateFilePath(onfHomeDir)
+		d := filepath.Join(homeDir, defaultOnfDir)
+		onfCredentialFile := cf.GetCredentialPath(d)
 		if exist, err := utils.Exists(onfCredentialFile); err == nil && exist {
 			return true
 		} else {

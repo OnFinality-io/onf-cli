@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"github.com/OnFinality-io/onf-cli/cmd/networkspec"
 	"log"
-	"os"
 	"path"
 
 	"github.com/OnFinality-io/onf-cli/cmd/info"
@@ -22,6 +21,12 @@ var profile string
 var version string
 var gitCommit string
 
+func init() {
+	viper.SetDefault("app.name", "onf-cli")
+	viper.SetDefault("app.version", version)
+	viper.SetDefault("git.commit", gitCommit)
+}
+
 func checkSetup() bool {
 	credentialFile := &setup.CredentialFile{}
 	return credentialFile.IsExistAtOnfAtHomeDir()
@@ -37,21 +42,18 @@ func loadConfig() {
 	if err != nil {
 		log.Fatal(err)
 	}
-
-	viper.SetDefault("app.name", "onf-cli")
-	viper.SetDefault("app.version", version)
-	viper.SetDefault("git.commit", gitCommit)
 }
 
 func main() {
-	if os.Args[1] != "setup" && !checkSetup() {
-		fmt.Println("please run `onf setup` to initial the configurations")
-		return
-	}
 	rootCmd := &cobra.Command{
-		Use:     "onf",
-		Version: viper.GetString("app.version"),
+		Use:           "onf",
+		Version:       viper.GetString("app.version"),
+		SilenceUsage:  true,
+		SilenceErrors: true,
 		PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
+			if !checkSetup() {
+				return errors.New("please run `onf setup` to initial the configurations")
+			}
 			loadConfig()
 			accessKey := viper.GetString(fmt.Sprintf("%s.onf_access_key", profile))
 			secretKey := viper.GetString(fmt.Sprintf("%s.onf_secret_key", profile))
@@ -77,6 +79,6 @@ func main() {
 		setup.NewCmd(),
 	)
 	if err := rootCmd.Execute(); err != nil {
-		log.Fatal(err)
+		fmt.Println(err)
 	}
 }
