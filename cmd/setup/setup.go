@@ -22,9 +22,9 @@ type CredentialConfig struct {
 }
 
 type Credential struct {
-	AccessKey   string `ini:"onf_access_key"`
-	SecretKey   string `ini:"onf_secret_key"`
-	WorkspaceID uint64 `ini:"default_workspace"`
+	AccessKey   string `ini:"onf_access_key" header:"onf_access_key"`
+	SecretKey   string `ini:"onf_secret_key" header:"onf_secret_key"`
+	WorkspaceID uint64 `ini:"default_workspace" header:"default_workspace"`
 }
 
 type CredentialFile struct {
@@ -69,8 +69,8 @@ func (cf *CredentialFile) IsExistAtOnfAtHomeDir() bool {
 	}
 }
 
-func CreateHomeDir(sysHomeDir, defaultDir string) (onfHomeDir string) {
-	onfHomeDir = filepath.Join(sysHomeDir, defaultDir)
+func CreateHomeDir(sysHomeDir, defaultOnfDir string) (onfHomeDir string) {
+	onfHomeDir = filepath.Join(sysHomeDir, defaultOnfDir)
 	if exist, err := utils.Exists(onfHomeDir); err == nil && exist {
 
 	} else {
@@ -113,4 +113,27 @@ func PersistentCredential(credential *CredentialConfig) {
 			fmt.Println("Fail to create onf config file at " + onfHomeDir)
 		}
 	}
+}
+
+func (cf *CredentialFile) GetAllSetup() []*CredentialConfig {
+	homeDir, err := os.UserHomeDir()
+	if err == nil {
+		d := filepath.Join(homeDir, defaultOnfDir)
+		onfCredentialFile := cf.GetCredentialPath(d)
+		cfg, err := ini.Load(onfCredentialFile)
+		if err != nil {
+			fmt.Printf("Fail to read file: %v", err)
+		} else {
+			configArray := make([]*CredentialConfig, 0)
+			for _, section := range cfg.Sections() {
+				credential := &Credential{}
+				section.MapTo(credential)
+				config := &CredentialConfig{Credential: credential, Section: section.Name()}
+				configArray = append(configArray, config)
+			}
+			return configArray
+		}
+
+	}
+	return nil
 }

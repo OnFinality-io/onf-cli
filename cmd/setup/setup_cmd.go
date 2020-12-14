@@ -2,6 +2,7 @@ package setup
 
 import (
 	"fmt"
+	"strconv"
 
 	"github.com/OnFinality-io/onf-cli/pkg/service"
 	"github.com/manifoldco/promptui"
@@ -16,13 +17,21 @@ func NewCmd() *cobra.Command {
 			return nil
 		},
 		Run: func(cmd *cobra.Command, args []string) {
-			Flow()
+			profile, err := cmd.Flags().GetString("profile")
+			if err != nil {
+				fmt.Printf("err:%s\n", err)
+				return
+			}
+			Flow(profile)
 		},
 	}
+	cmd.AddCommand(
+		listCmd(),
+	)
 	return cmd
 }
 
-func Flow() {
+func Flow(section string) {
 
 	credential := &Credential{}
 
@@ -53,10 +62,12 @@ func Flow() {
 	list, err := service.GetWorkspaceList()
 	if len(list) == 1 {
 		credential.WorkspaceID = list[0].ID
-	} else {
+	} else if len(list) > 0 {
 		var name []string
+		var tmp string
 		for _, ws := range list {
-			name = append(name, ws.Name)
+			tmp = ws.Name + "(" + strconv.FormatUint(ws.ID, 10) + ")"
+			name = append(name, tmp)
 		}
 		workspaceIDPrompt := promptui.Select{
 			Label: "Please select your workspace",
@@ -72,6 +83,7 @@ func Flow() {
 
 	config := &CredentialConfig{
 		Credential: credential,
+		Section:    section,
 	}
 	PersistentCredential(config)
 }
