@@ -1,8 +1,12 @@
 package setup
 
 import (
+	"bufio"
 	"fmt"
+	"os"
+	"runtime"
 	"strconv"
+	"strings"
 
 	"github.com/OnFinality-io/onf-cli/pkg/service"
 	"github.com/manifoldco/promptui"
@@ -34,32 +38,15 @@ func NewCmd() *cobra.Command {
 func Flow(section string) {
 
 	credential := &Credential{}
-
-	// access key
-	accessKeyPrompt := promptui.Prompt{
-		Label: "Please input your access key",
-	}
-	result, err := accessKeyPrompt.Run()
-	if err != nil {
-		fmt.Printf("Fail to add access key %v\n", err)
-		return
-	}
-	credential.AccessKey = result
-
-	// secret key
-	secretKeyPrompt := promptui.Prompt{
-		Label: "Please input your secret key",
-	}
-	result, err = secretKeyPrompt.Run()
-	if err != nil {
-		fmt.Printf("Fail to add secret key %v\n", err)
-		return
-	}
-	credential.SecretKey = result
+	// access key and secret key
+	cliForCredential(credential)
 
 	// workspace id key
 	service.Init(credential.AccessKey, credential.SecretKey)
 	list, err := service.GetWorkspaceList()
+	if err != nil {
+		fmt.Printf("Get workspace err %v\n", err)
+	}
 	if len(list) == 1 {
 		credential.WorkspaceID = list[0].ID
 	} else if len(list) > 0 {
@@ -86,4 +73,50 @@ func Flow(section string) {
 		Section:    section,
 	}
 	PersistentCredential(config)
+}
+
+func cliForCredential(credential *Credential) {
+	sysType := runtime.GOOS
+	if sysType == "windows" {
+		// access key
+		reader := bufio.NewReader(os.Stdin)
+		fmt.Print("Please input your access key:")
+		result, err := reader.ReadString('\n')
+		if err != nil {
+			fmt.Printf("Fail to add access key %v\n", err)
+		}
+		credential.AccessKey = strings.TrimSpace(result)
+
+		// secret key
+		fmt.Print("Please input your secret key:")
+		result, err = reader.ReadString('\n')
+		if err != nil {
+			fmt.Printf("Fail to add access key %v\n", err)
+		}
+		credential.SecretKey = strings.TrimSpace(result)
+	} else {
+		// access key
+		accessKeyPrompt := promptui.Prompt{
+			Label: "Please input your access key",
+		}
+		result, err := accessKeyPrompt.Run()
+		if err != nil {
+			fmt.Printf("Fail to add access key %v\n", err)
+			return
+		}
+		credential.AccessKey = result
+
+		// secret key
+		secretKeyPrompt := promptui.Prompt{
+			Label: "Please input your secret key",
+		}
+		result, err = secretKeyPrompt.Run()
+		if err != nil {
+			fmt.Printf("Fail to add secret key %v\n", err)
+			return
+		}
+		credential.SecretKey = result
+
+	}
+
 }
