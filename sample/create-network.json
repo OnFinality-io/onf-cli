@@ -1,0 +1,9 @@
+{
+  "name": "mandala",
+  "displayName": "mandala created by cli",
+  "protocol": "substrate",
+  "imageRepository": "acala/acala-node",
+  "metadata": {
+      "chainspec":"mandala"
+  }
+}

@@ -2,12 +2,13 @@ package api
 
 import (
 	"fmt"
-	"github.com/parnurzeal/gorequest"
-	"github.com/spf13/viper"
 	"net/http"
 	"net/url"
 	"strings"
 	"time"
+
+	"github.com/parnurzeal/gorequest"
+	"github.com/spf13/viper"
 )
 
 type Method string
@@ -27,8 +28,12 @@ type Api struct {
 }
 
 func New(accessKey, secretKey string) *Api {
-	baseURL := "https://api.onfinality.me/api/v1"
+	baseURL := "https://api.onfinality.io/api/v1"
 	//baseURL := "http://localhost:5000/api/v1"
+	cburl := viper.GetString("default.cburl") //Custom base url
+	if cburl != "" {
+		baseURL = cburl
+	}
 	req := gorequest.New()
 	req.Header.Set("content-type", "application/json")
 	req.Header.Set("x-onf-client", viper.GetString("app.name"))
