@@ -5,15 +5,10 @@ import (
 	"os"
 	"path/filepath"
 
+	"github.com/OnFinality-io/onf-cli/pkg/constant"
 	"github.com/OnFinality-io/onf-cli/pkg/utils"
 
 	"gopkg.in/ini.v1"
-)
-
-const (
-	defaultOnfDir              = ".onf"
-	defaultCredentialFileName  = "credentials"
-	defaultCredentialsFileType = "ini"
 )
 
 type CredentialConfig struct {
@@ -34,10 +29,10 @@ type CredentialFile struct {
 
 func (cf *CredentialFile) GetCredentialPath(onfHomeDir string) (onfCredentialFile string) {
 	if cf.CredentialFileName == "" {
-		cf.CredentialFileName = defaultCredentialFileName
+		cf.CredentialFileName = constant.DefaultCredentialFileName
 	}
 	if cf.CredentialsFileType == "" {
-		cf.CredentialsFileType = defaultCredentialsFileType
+		cf.CredentialsFileType = constant.DefaultCredentialFileType
 	}
 	onfCredentialFile = filepath.Join(onfHomeDir, cf.CredentialFileName)
 	return onfCredentialFile
@@ -57,7 +52,7 @@ func (cf *CredentialFile) CreateCredentialFileAt(onfHomeDir string) (onfCredenti
 func (cf *CredentialFile) IsExistAtOnfAtHomeDir() bool {
 	homeDir, err := os.UserHomeDir()
 	if err == nil {
-		d := filepath.Join(homeDir, defaultOnfDir)
+		d := filepath.Join(homeDir, constant.DefaultOnfDir)
 		onfCredentialFile := cf.GetCredentialPath(d)
 		if exist, err := utils.Exists(onfCredentialFile); err == nil && exist {
 			return true
@@ -69,8 +64,8 @@ func (cf *CredentialFile) IsExistAtOnfAtHomeDir() bool {
 	}
 }
 
-func CreateHomeDir(sysHomeDir, defaultOnfDir string) (onfHomeDir string) {
-	onfHomeDir = filepath.Join(sysHomeDir, defaultOnfDir)
+func CreateHomeDir(sysHomeDir, DefaultOnfDir string) (onfHomeDir string) {
+	onfHomeDir = filepath.Join(sysHomeDir, DefaultOnfDir)
 	if exist, err := utils.Exists(onfHomeDir); err == nil && exist {
 
 	} else {
@@ -86,7 +81,7 @@ func CreateHomeDir(sysHomeDir, defaultOnfDir string) (onfHomeDir string) {
 func PersistentCredential(credential *CredentialConfig) {
 	homeDir, err := os.UserHomeDir()
 	if err == nil {
-		onfHomeDir := CreateHomeDir(homeDir, defaultOnfDir)
+		onfHomeDir := CreateHomeDir(homeDir, constant.DefaultOnfDir)
 		credentialFile := &CredentialFile{}
 		onfCredentialFile, err := credentialFile.CreateCredentialFileAt(onfHomeDir)
 		if err == nil {
@@ -118,7 +113,7 @@ func PersistentCredential(credential *CredentialConfig) {
 func (cf *CredentialFile) GetAllSetup() []*CredentialConfig {
 	homeDir, err := os.UserHomeDir()
 	if err == nil {
-		d := filepath.Join(homeDir, defaultOnfDir)
+		d := filepath.Join(homeDir, constant.DefaultOnfDir)
 		onfCredentialFile := cf.GetCredentialPath(d)
 		cfg, err := ini.Load(onfCredentialFile)
 		if err != nil {

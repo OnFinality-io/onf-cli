@@ -7,6 +7,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/OnFinality-io/onf-cli/pkg/base"
 	"github.com/parnurzeal/gorequest"
 	"github.com/spf13/viper"
 )
@@ -28,12 +29,7 @@ type Api struct {
 }
 
 func New(accessKey, secretKey string) *Api {
-	baseURL := "https://api.onfinality.io/api/v1"
-	//baseURL := "http://localhost:5000/api/v1"
-	cburl := viper.GetString("default.cburl") //Custom base url
-	if cburl != "" {
-		baseURL = cburl
-	}
+	baseURL := base.BaseUrl()
 	req := gorequest.New()
 	req.Header.Set("content-type", "application/json")
 	req.Header.Set("x-onf-client", viper.GetString("app.name"))

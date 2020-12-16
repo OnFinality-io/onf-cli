@@ -39,8 +39,10 @@ func Flow(section string) {
 
 	credential := &Credential{}
 	// access key and secret key
-	cliForCredential(credential)
-
+	err := cliForCredential(credential)
+	if err != nil {
+		return
+	}
 	// workspace id key
 	service.Init(credential.AccessKey, credential.SecretKey)
 	list, err := service.GetWorkspaceList()
@@ -75,7 +77,7 @@ func Flow(section string) {
 	PersistentCredential(config)
 }
 
-func cliForCredential(credential *Credential) {
+func cliForCredential(credential *Credential) error {
 	sysType := runtime.GOOS
 	if sysType == "windows" {
 		// access key
@@ -83,7 +85,8 @@ func cliForCredential(credential *Credential) {
 		fmt.Print("Please input your access key:")
 		result, err := reader.ReadString('\n')
 		if err != nil {
-			fmt.Printf("Fail to add access key %v\n", err)
+			fmt.Printf("Fail to add access key reason:%v\n", err)
+			return fmt.Errorf("Fail to add access key reason:%s", err)
 		}
 		credential.AccessKey = strings.TrimSpace(result)
 
@@ -91,7 +94,8 @@ func cliForCredential(credential *Credential) {
 		fmt.Print("Please input your secret key:")
 		result, err = reader.ReadString('\n')
 		if err != nil {
-			fmt.Printf("Fail to add access key %v\n", err)
+			fmt.Printf("Fail to add secret key reason:%v\n", err)
+			return fmt.Errorf("Fail to add secret key reason:%s", err)
 		}
 		credential.SecretKey = strings.TrimSpace(result)
 	} else {
@@ -101,8 +105,8 @@ func cliForCredential(credential *Credential) {
 		}
 		result, err := accessKeyPrompt.Run()
 		if err != nil {
-			fmt.Printf("Fail to add access key %v\n", err)
-			return
+			fmt.Printf("Fail to add access key reason:%v\n", err)
+			return fmt.Errorf("Fail to add access key reason:%s", err)
 		}
 		credential.AccessKey = result
 
@@ -112,11 +116,12 @@ func cliForCredential(credential *Credential) {
 		}
 		result, err = secretKeyPrompt.Run()
 		if err != nil {
-			fmt.Printf("Fail to add secret key %v\n", err)
-			return
+			fmt.Printf("Fail to add secret key reason:%v\n", err)
+			return fmt.Errorf("Fail to add secret key reason:%s", err)
 		}
 		credential.SecretKey = result
 
 	}
 
+	return nil
 }

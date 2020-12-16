@@ -2,8 +2,9 @@ package service
 
 import (
 	"fmt"
-	"github.com/OnFinality-io/onf-cli/pkg/api"
 	"time"
+
+	"github.com/OnFinality-io/onf-cli/pkg/api"
 )
 
 type Workspace struct {
