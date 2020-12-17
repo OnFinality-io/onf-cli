@@ -1,6 +1,7 @@
 package service
 
 import (
+	"encoding/json"
 	"fmt"
 	"time"
 
@@ -52,6 +53,32 @@ type Metadata struct {
 	Chainspec string `json:"chainspec" header:"chainspec"`
 }
 
+type GenerateChainSpecPayload struct {
+	ImageVersion string   `json:"imageVersion" `
+	CliArgs      []string `json:"cliArgs" `
+}
+type GenerateChainSpecResult struct {
+	TaskId     string `json:"taskId"`
+	StatusCode int    `json:"statusCode"`
+	Message    string `json:"message"`
+	Error      string `json:"error"`
+}
+
+type BootstrapChainSpecPayload struct {
+	Bootnode     BootstrapChainSpecNode `json:"bootnode"`
+	Storage      string                 `json:"storage"`
+	NodeSpecKey  string                 `json:"nodeSpecKey"`
+	UseAPIKey    bool                   `json:"useApiKey"`
+	ImageVersion string                 `json:"imageVersion"`
+}
+type BootstrapChainSpecMetadata struct {
+}
+type BootstrapChainSpecNode struct {
+	Cluster  string                     `json:"cluster"`
+	NodeName string                     `json:"nodeName"`
+	Metadata BootstrapChainSpecMetadata `json:"metadata"`
+}
+
 func GetNetworkSpecs(wsID int64) ([]NetworkSpec, error) {
 	var specs []NetworkSpec
 	path := fmt.Sprintf("/workspaces/%d/network-specs", wsID)
@@ -78,4 +105,41 @@ func GetNetworkSpec(wsID int64, networkID string) (*NetworkSpec, error) {
 	path := fmt.Sprintf("/workspaces/%d/network-specs/%s", wsID, networkID)
 	resp, d, errs := instance.Request(api.MethodGet, path, nil).EndStruct(&specs)
 	return specs, checkError(resp, d, errs)
+}
+
+func GenerateChainSpec(wsID int64, networkID string, payload *GenerateChainSpecPayload) (*GenerateChainSpecResult, error) {
+	var result *GenerateChainSpecResult
+	path := fmt.Sprintf("/workspaces/%d/private-chains/%s/chainSpec/generate", wsID, networkID)
+
+	resp, d, errs := instance.Request(api.MethodPost, path, &api.RequestOptions{
+		Body: payload,
+	}).EndBytes()
+	err := json.Unmarshal(d, &result)
+	if err != nil {
+		if len(d) > 0 {
+			result = &GenerateChainSpecResult{TaskId: string(d)}
+		}
+	}
+	return result, checkError(resp, d, errs)
+}
+func BootstrapChainSpec(wsID int64, networkID string, payload *BootstrapChainSpecPayload) (*NetworkSpecEntity, error) {
+	path := fmt.Sprintf("/workspaces/%d/private-chains/%s/bootstrap", wsID, networkID)
+	node := &NetworkSpecEntity{}
+	resp, d, errs := instance.Request(api.MethodPost, path, &api.RequestOptions{
+		Body: payload,
+	}).EndStruct(node)
+	return node, checkError(resp, d, errs)
+}
+
+func UploadChainSpec(wsID int64, networkID string, files []string) error {
+	path := fmt.Sprintf("/workspaces/%d/private-chains/%s/chainSpec/upload", wsID, networkID)
+	// b, _ := ioutil.ReadFile(file)
+	req := instance.Upload(path, nil)
+	for _, file := range files {
+		req.SendFile(file, "files")
+	}
+
+	resp, d, errs := req.EndBytes()
+	fmt.Println(string(d))
+	return checkError(resp, d, errs)
 }

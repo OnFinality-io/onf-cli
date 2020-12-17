@@ -18,6 +18,9 @@ func NewCmd() *cobra.Command {
 		CreateCmd(),
 		DeleteCmd(),
 		ShowCmd(),
+		GenerateCmd(),
+		BootstrapCmd(),
+		UploadCmd(),
 	)
 	return cmd
 }

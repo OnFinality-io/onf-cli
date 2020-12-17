@@ -3,6 +3,7 @@ package service
 import (
 	"encoding/json"
 	"fmt"
+
 	"github.com/OnFinality-io/onf-cli/pkg/api"
 	"github.com/parnurzeal/gorequest"
 )
@@ -18,7 +19,7 @@ type errResponse struct {
 }
 
 func checkError(resp gorequest.Response, data []byte, err []error) error {
-	if resp.StatusCode >= 300 {
+	if resp != nil && resp.StatusCode >= 300 {
 		r := errResponse{}
 		err := json.Unmarshal(data, &r)
 		if err != nil {
