@@ -16,5 +16,6 @@ require (
 	github.com/spf13/viper v1.7.0
 	github.com/stretchr/testify v1.6.1 // indirect
 	gopkg.in/ini.v1 v1.62.0
+	gopkg.in/yaml.v2 v2.2.8
 	moul.io/http2curl v1.0.0 // indirect
 )

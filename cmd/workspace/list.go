@@ -2,13 +2,15 @@ package workspace
 
 import (
 	"fmt"
+
 	"github.com/OnFinality-io/onf-cli/pkg/printer"
 	"github.com/OnFinality-io/onf-cli/pkg/service"
 	"github.com/spf13/cobra"
 )
 
 func ListCmd() *cobra.Command {
-	return &cobra.Command{
+	printFlags := printer.NewPrintFlags()
+	c := &cobra.Command{
 		Use:   "workspaces",
 		Short: "list all workspaces",
 		Run: func(cmd *cobra.Command, args []string) {
@@ -17,7 +19,9 @@ func ListCmd() *cobra.Command {
 				fmt.Println(err.Error())
 				return
 			}
-			printer.New().Print(list)
+			printer.NewWithPrintFlag(printFlags).Print(list)
 		},
 	}
+	printFlags.AddFlags(c)
+	return c
 }

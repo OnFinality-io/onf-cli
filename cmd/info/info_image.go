@@ -2,6 +2,7 @@ package info
 
 import (
 	"fmt"
+
 	"github.com/OnFinality-io/onf-cli/pkg/printer"
 
 	"github.com/OnFinality-io/onf-cli/pkg/service"
@@ -10,6 +11,7 @@ import (
 
 func ListImageVersionsCmd() *cobra.Command {
 	var image string
+	printFlags := printer.NewPrintFlags()
 	c := &cobra.Command{
 		Use:   "image",
 		Short: "List the image version",
@@ -21,12 +23,12 @@ func ListImageVersionsCmd() *cobra.Command {
 					return
 				}
 
-				printer.New().Print(result)
+				printer.NewWithPrintFlag(printFlags).Print(result)
 			}
 
 		},
 	}
-
+	printFlags.AddFlags(c)
 	c.Flags().StringVarP(&image, "name", "n", "", "image name")
 	_ = c.MarkFlagRequired("name")
 	return c

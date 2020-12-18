@@ -11,6 +11,7 @@ import (
 
 func CreateCmd() *cobra.Command {
 	var filePath string
+	printFlags := printer.NewPrintFlags()
 	c := &cobra.Command{
 		Use:   "create (-f FILENAME)",
 		Short: "Create your network",
@@ -31,9 +32,10 @@ func CreateCmd() *cobra.Command {
 				fmt.Println(err.Error())
 				return
 			}
-			printer.New().Print(specs)
+			printer.NewWithPrintFlag(printFlags).Print(specs)
 		},
 	}
+	printFlags.AddFlags(c)
 	c.Flags().StringVarP(&filePath, "file", "f", "", "definition file for create network, yaml or json")
 	return c
 }

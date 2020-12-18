@@ -2,6 +2,7 @@ package node
 
 import (
 	"fmt"
+
 	"github.com/OnFinality-io/onf-cli/cmd/helpers"
 	"github.com/OnFinality-io/onf-cli/pkg/service"
 	"github.com/spf13/cobra"

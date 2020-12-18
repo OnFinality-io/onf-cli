@@ -10,6 +10,7 @@ import (
 )
 
 func ClusterCmd() *cobra.Command {
+	printFlags := printer.NewPrintFlags()
 	c := &cobra.Command{
 		Use:   "cluster",
 		Short: "Show cluster",
@@ -19,9 +20,10 @@ func ClusterCmd() *cobra.Command {
 				fmt.Println(err.Error())
 				return
 			}
-			printer.New().Print(result.Clusters)
+			printer.NewWithPrintFlag(printFlags).Print(result.Clusters)
 
 		},
 	}
+	printFlags.AddFlags(c)
 	return c
 }

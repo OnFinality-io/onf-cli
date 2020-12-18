@@ -11,6 +11,7 @@ import (
 
 func GenerateCmd() *cobra.Command {
 	var networkID, imageVersion string
+	printFlags := printer.NewPrintFlags()
 	cmd := &cobra.Command{
 		Use:   "generate",
 		Short: "Generate chanspec for the network",
@@ -32,10 +33,11 @@ func GenerateCmd() *cobra.Command {
 					fmt.Println(err.Error())
 					return
 				}
-				printer.New().Print(specs)
+				printer.NewWithPrintFlag(printFlags).Print(specs)
 			}
 		},
 	}
+	printFlags.AddFlags(cmd)
 	cmd.Flags().StringVarP(&networkID, "network", "n", "", "Network id")
 	cmd.Flags().StringVarP(&imageVersion, "image-version", "i", "", "Image version")
 	_ = cmd.MarkFlagRequired("network")

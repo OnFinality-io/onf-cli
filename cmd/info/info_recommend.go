@@ -10,6 +10,7 @@ import (
 )
 
 func NodeRecommendsCmd() *cobra.Command {
+	printFlags := printer.NewPrintFlags()
 	var network string
 	c := &cobra.Command{
 		Use:   "recommend",
@@ -22,11 +23,12 @@ func NodeRecommendsCmd() *cobra.Command {
 					return
 				}
 
-				printer.New().Print(result)
+				printer.NewWithPrintFlag(printFlags).Print(result)
 			}
 
 		},
 	}
+	printFlags.AddFlags(c)
 
 	c.Flags().StringVarP(&network, "network-name", "n", "", "network name")
 	_ = c.MarkFlagRequired("name")

@@ -10,6 +10,7 @@ import (
 )
 
 func NodeSpecCmd() *cobra.Command {
+	printFlags := printer.NewPrintFlags()
 	c := &cobra.Command{
 		Use:   "node-spec",
 		Short: "Show node specs",
@@ -19,10 +20,11 @@ func NodeSpecCmd() *cobra.Command {
 				fmt.Println(err.Error())
 				return
 			}
-			printer.New().Print(result.NodeSpecs)
+			printer.NewWithPrintFlag(printFlags).Print(result.NodeSpecs)
 
 		},
 	}
+	printFlags.AddFlags(c)
 
 	c.AddCommand(
 		NodeRecommendsCmd(),

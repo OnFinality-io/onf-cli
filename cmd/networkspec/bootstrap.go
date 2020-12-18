@@ -11,6 +11,7 @@ import (
 
 func BootstrapCmd() *cobra.Command {
 	var filePath, networkID string
+	printFlags := printer.NewPrintFlags()
 	c := &cobra.Command{
 		Use:   "bootstrap",
 		Short: "bootstrap chain spec",
@@ -31,9 +32,10 @@ func BootstrapCmd() *cobra.Command {
 				fmt.Println(err.Error())
 				return
 			}
-			printer.New().Print(specs)
+			printer.NewWithPrintFlag(printFlags).Print(specs)
 		},
 	}
+	printFlags.AddFlags(c)
 	c.Flags().StringVarP(&filePath, "file", "f", "", "definition file for create network, yaml or json")
 	c.Flags().StringVarP(&networkID, "network", "n", "", "Network id")
 	_ = c.MarkFlagRequired("network")

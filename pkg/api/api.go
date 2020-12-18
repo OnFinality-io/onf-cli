@@ -84,6 +84,9 @@ func (a *Api) Request(method Method, path string, opts *RequestOptions) *goreque
 
 func (a *Api) Upload(path string, opts *RequestOptions) *gorequest.SuperAgent {
 	// overwrite content-type
-	a.req.Header.Set("content-type", "multipart/form-data; boundary=WebAppBoundary")
+	contentTypeKey := "content-type"
+	originalContentType := a.req.Header.Get(contentTypeKey)
+	a.req.Header.Set(contentTypeKey, "multipart/form-data; boundary=WebAppBoundary")
+	defer a.req.Header.Set(contentTypeKey, originalContentType)
 	return a.Request(MethodPost, path, opts)
 }

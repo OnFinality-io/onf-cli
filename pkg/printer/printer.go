@@ -3,35 +3,25 @@ package printer
 import (
 	"fmt"
 	"os"
-
-	"github.com/lensesio/tableprinter"
 )
 
 type Printer struct {
-	BgBlackColor  int
-	HeaderFgColor int
+	PrintFlags *PrintFlags
 }
 
 func New() *Printer {
-	return &Printer{}
+	return &Printer{PrintFlags: NewPrintFlags()}
+}
+func NewWithPrintFlag(printFlags *PrintFlags) *Printer {
+	return &Printer{PrintFlags: printFlags}
 }
 
-func (p Printer) Print(in interface{}, filters ...interface{}) {
-	printer := tableprinter.New(os.Stdout)
-	// Optionally, customize the table, import of the underline 'tablewriter' package is required for that.
-	// printer.BorderTop, printer.BorderBottom, printer.BorderLeft, printer.BorderRight = true, true, true, true
-	printer.CenterSeparator = ""
-	printer.ColumnSeparator = ""
-	printer.RowSeparator = ""
-	printer.AutoFormatHeaders = false
-	printer.HeaderLine = false
-	printer.HeaderBgColor = p.BgBlackColor
-	printer.HeaderFgColor = p.HeaderFgColor
-
-	printer.Print(in, filters)
+func (p Printer) Print(in interface{}) {
+	out, _ := p.PrintFlags.ToPrinter()
+	out.PrintObj(in, os.Stdout)
 }
 
-func (p Printer) PrintWithTitle(title string, in interface{}, filters ...interface{}) {
+func (p Printer) PrintWithTitle(title string, in interface{}) {
 	fmt.Println(title)
-	p.Print(in, filters)
+	p.Print(in)
 }

@@ -2,12 +2,13 @@ package workspace
 
 import (
 	"fmt"
+	"strconv"
+	"sync"
+
 	"github.com/OnFinality-io/onf-cli/cmd/helpers"
 	"github.com/OnFinality-io/onf-cli/pkg/printer"
 	"github.com/OnFinality-io/onf-cli/pkg/service"
 	"github.com/spf13/cobra"
-	"strconv"
-	"sync"
 )
 
 type memberView struct {
@@ -19,6 +20,7 @@ type memberView struct {
 }
 
 func MemberCmd() *cobra.Command {
+	printFlags := printer.NewPrintFlags()
 	var wsID int64
 	c := &cobra.Command{
 		Use:   "members",
@@ -79,9 +81,10 @@ func MemberCmd() *cobra.Command {
 					Status: "pending",
 				})
 			}
-			printer.New().Print(view)
+			printer.NewWithPrintFlag(printFlags).Print(view)
 		},
 	}
+	printFlags.AddFlags(c)
 	c.Flags().Int64VarP(&wsID, "workspace", "w", 0, "workspace id")
 	return c
 }

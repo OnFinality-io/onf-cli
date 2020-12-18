@@ -6,7 +6,8 @@ import (
 )
 
 func listCmd() *cobra.Command {
-	return &cobra.Command{
+	printFlags := printer.NewPrintFlags()
+	c := &cobra.Command{
 		Use:   "ls",
 		Short: "Show all profile",
 		Run: func(cmd *cobra.Command, args []string) {
@@ -14,9 +15,11 @@ func listCmd() *cobra.Command {
 			configArray := CredentialFile.GetAllSetup()
 			for _, config := range configArray {
 				if config.Section != "DEFAULT" {
-					printer.New().PrintWithTitle(config.Section, config.Credential)
+					printer.NewWithPrintFlag(printFlags).PrintWithTitle(config.Section, config.Credential)
 				}
 			}
 		},
 	}
+	printFlags.AddFlags(c)
+	return c
 }

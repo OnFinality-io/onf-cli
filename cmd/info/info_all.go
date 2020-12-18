@@ -9,6 +9,7 @@ import (
 )
 
 func AllCmd() *cobra.Command {
+	printFlags := printer.NewPrintFlags()
 	c := &cobra.Command{
 		Use:   "all",
 		Short: "List cluster and node specifications",
@@ -18,11 +19,12 @@ func AllCmd() *cobra.Command {
 				fmt.Println(err.Error())
 				return
 			}
-			printer.New().PrintWithTitle("Clusters", result.Clusters)
-			printer.New().PrintWithTitle("NodeSpecs", result.NodeSpecs)
-			// printer.New().PrintWithTitle("Protocols", result.Protocols)
+			printer.NewWithPrintFlag(printFlags).PrintWithTitle("Clusters", result.Clusters)
+			printer.NewWithPrintFlag(printFlags).PrintWithTitle("NodeSpecs", result.NodeSpecs)
+			// printer.NewWithPrintFlag(printFlags).PrintWithTitle("Protocols", result.Protocols)
 
 		},
 	}
+	printFlags.AddFlags(c)
 	return c
 }

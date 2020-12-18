@@ -11,6 +11,7 @@ import (
 
 func ShowCmd() *cobra.Command {
 	var networkID string
+	printFlags := printer.NewPrintFlags()
 	cmd := &cobra.Command{
 		Use:   "show",
 		Short: "Show network specs in the OnFinality platform",
@@ -26,10 +27,11 @@ func ShowCmd() *cobra.Command {
 					fmt.Println(err.Error())
 					return
 				}
-				printer.New().Print(specs)
+				printer.NewWithPrintFlag(printFlags).Print(specs)
 			}
 		},
 	}
+	printFlags.AddFlags(cmd)
 	cmd.PersistentFlags().Int64VarP(&wsID, "workspace", "w", 0, "Workspace ID")
 	cmd.Flags().StringVarP(&networkID, "network", "n", "", "Network id")
 	_ = cmd.MarkFlagRequired("network")

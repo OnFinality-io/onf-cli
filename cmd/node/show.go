@@ -2,6 +2,7 @@ package node
 
 import (
 	"fmt"
+
 	"github.com/OnFinality-io/onf-cli/cmd/helpers"
 	"github.com/OnFinality-io/onf-cli/pkg/printer"
 	"github.com/OnFinality-io/onf-cli/pkg/service"
@@ -14,6 +15,7 @@ type propertyView struct {
 }
 
 func showCmd() *cobra.Command {
+	printFlags := printer.NewPrintFlags()
 	c := &cobra.Command{
 		Use:   "show",
 		Short: "show the detail information on a given node",
@@ -40,16 +42,17 @@ func showCmd() *cobra.Command {
 				{"Storage Size:", node.Storage},
 				{"Status:", node.Status},
 			}
-			printer.New().PrintWithTitle("Information", view)
+			printer.NewWithPrintFlag(printFlags).PrintWithTitle("Information", view)
 			fmt.Println("")
 
 			view = []propertyView{
 				{"HTTPs", node.Endpoints.RPC},
 				{"Websocket", node.Endpoints.WS},
 			}
-			printer.New().PrintWithTitle("Endpoints", view)
+			printer.NewWithPrintFlag(printFlags).PrintWithTitle("Endpoints", view)
 		},
 	}
+	printFlags.AddFlags(c)
 	c.Flags().Int64VarP(&nodeID, "node", "n", 0, "node id")
 	_ = c.MarkFlagRequired("node")
 	return c
