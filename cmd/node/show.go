@@ -14,6 +14,11 @@ type propertyView struct {
 	Value interface{} `header:"Value"`
 }
 
+type OutputView struct {
+	Information []propertyView `json:"Information"`
+	Endpoints   []propertyView `json:"Endpoints"`
+}
+
 func showCmd() *cobra.Command {
 	printFlags := printer.NewPrintFlags()
 	c := &cobra.Command{
@@ -30,7 +35,7 @@ func showCmd() *cobra.Command {
 				fmt.Println(err.Error())
 				return
 			}
-			view := []propertyView{
+			informationView := []propertyView{
 				{"ID:", node.ID},
 				{"Name:", node.Name},
 				{"Workspace:", node.WorkspaceID},
@@ -42,14 +47,19 @@ func showCmd() *cobra.Command {
 				{"Storage Size:", node.Storage},
 				{"Status:", node.Status},
 			}
-			printer.NewWithPrintFlag(printFlags).PrintWithTitle("Information", view)
-			fmt.Println("")
-
-			view = []propertyView{
+			endpointsView := []propertyView{
 				{"HTTPs", node.Endpoints.RPC},
 				{"Websocket", node.Endpoints.WS},
 			}
-			printer.NewWithPrintFlag(printFlags).PrintWithTitle("Endpoints", view)
+
+			if printFlags.OutputFormat != nil && *printFlags.OutputFormat != "" {
+				outputView := &OutputView{Information: informationView, Endpoints: endpointsView}
+				printer.NewWithPrintFlag(printFlags).Print(outputView)
+			} else {
+				printer.New().PrintWithTitle("Information", informationView)
+				fmt.Println("")
+				printer.New().PrintWithTitle("Endpoints", endpointsView)
+			}
 		},
 	}
 	printFlags.AddFlags(c)

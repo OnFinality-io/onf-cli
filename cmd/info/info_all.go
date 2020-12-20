@@ -8,6 +8,11 @@ import (
 	"github.com/spf13/cobra"
 )
 
+type OutputView struct {
+	Clusters  []service.Clusters  `json:"Clusters"`
+	NodeSpecs []service.NodeSpecs `json:"NodeSpecs"`
+}
+
 func AllCmd() *cobra.Command {
 	printFlags := printer.NewPrintFlags()
 	c := &cobra.Command{
@@ -19,9 +24,13 @@ func AllCmd() *cobra.Command {
 				fmt.Println(err.Error())
 				return
 			}
-			printer.NewWithPrintFlag(printFlags).PrintWithTitle("Clusters", result.Clusters)
-			printer.NewWithPrintFlag(printFlags).PrintWithTitle("NodeSpecs", result.NodeSpecs)
-			// printer.NewWithPrintFlag(printFlags).PrintWithTitle("Protocols", result.Protocols)
+			if printFlags.OutputFormat != nil && *printFlags.OutputFormat != "" {
+				outputView := &OutputView{Clusters: result.Clusters, NodeSpecs: result.NodeSpecs}
+				printer.NewWithPrintFlag(printFlags).Print(outputView)
+			} else {
+				printer.NewWithPrintFlag(printFlags).PrintWithTitle("Clusters", result.Clusters)
+				printer.NewWithPrintFlag(printFlags).PrintWithTitle("NodeSpecs", result.NodeSpecs)
+			}
 
 		},
 	}
