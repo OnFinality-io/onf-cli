@@ -4,13 +4,17 @@ import (
 	"fmt"
 
 	"github.com/OnFinality-io/onf-cli/cmd/helpers"
+	"github.com/OnFinality-io/onf-cli/pkg/printer"
 	"github.com/OnFinality-io/onf-cli/pkg/service"
+	"github.com/OnFinality-io/onf-cli/pkg/watcher"
 	"github.com/spf13/cobra"
 )
 
 var filePath string
 
 func createCmd() *cobra.Command {
+	watcherFlags := watcher.NewWatcherFlags()
+	printFlags := printer.NewPrintFlags()
 	c := &cobra.Command{
 		Use:   "create (-f FILENAME)",
 		Short: "create a new dedicate node",
@@ -33,8 +37,24 @@ func createCmd() *cobra.Command {
 				return
 			}
 			fmt.Println("Successfully created node, #ID:", node.ID)
+			if node.ID > 0 {
+				watcherFlags.ToWatch(func(done chan bool) {
+					node, _ := service.GetNodeStatus(wsID, int64(node.ID))
+					if printFlags.OutputFormat != nil && *printFlags.OutputFormat != "" {
+						printer.NewWithPrintFlag(printFlags).Print(node)
+
+					} else {
+						fmt.Println("current status is", node.Status)
+					}
+					if node.Status == Running {
+						done <- true
+					}
+				})
+			}
 		},
 	}
 	c.Flags().StringVarP(&filePath, "file", "f", "", "definition file for create node, yaml or json")
+	watcherFlags.AddFlags(c, "Watch for creation status")
+	printFlags.AddFlags(c)
 	return c
 }

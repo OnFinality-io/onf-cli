@@ -2,6 +2,7 @@ package service
 
 import (
 	"fmt"
+
 	"github.com/OnFinality-io/onf-cli/pkg/api"
 )
 
@@ -62,4 +63,11 @@ func ExpandNodeStorage(wsID, nodeID, size int64) error {
 		},
 	}).End()
 	return checkError(resp, []byte(d), errs)
+}
+
+func GetNodeStatus(wsID, nodeID int64) (*NodeStatus, error) {
+	node := NodeStatus{}
+	path := fmt.Sprintf("/workspaces/%d/nodes/%d/status", wsID, nodeID)
+	resp, d, errs := instance.Request(api.MethodGet, path, nil).EndStruct(&node)
+	return &node, checkError(resp, d, errs)
 }

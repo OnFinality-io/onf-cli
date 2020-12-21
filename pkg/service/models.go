@@ -69,3 +69,7 @@ type UpdateNodePayload struct {
 	ImageVersion *string       `json:"imageVersion"`
 	Metadata     *NodeMetadata `json:"metadata"`
 }
+
+type NodeStatus struct {
+	Status string `json:"status"`
+}
