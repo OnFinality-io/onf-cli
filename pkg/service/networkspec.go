@@ -1,8 +1,12 @@
 package service
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
+	"io/ioutil"
+	"net/http/httputil"
+	"net/url"
 	"time"
 
 	"github.com/OnFinality-io/onf-cli/pkg/api"
@@ -133,13 +137,38 @@ func BootstrapChainSpec(wsID int64, networkID string, payload *BootstrapChainSpe
 
 func UploadChainSpec(wsID int64, networkID string, files []string) error {
 	path := fmt.Sprintf("/workspaces/%d/private-chains/%s/chainSpec/upload", wsID, networkID)
-	// b, _ := ioutil.ReadFile(file)
-	req := instance.Upload(path, nil)
-	for _, file := range files {
-		req.SendFile(file, "files")
+	req := instance.Upload(path, &api.RequestOptions{Files: map[string]string{
+		"chainspec.json": files[0],
+	}})
+	req.TargetType = req.ForceType
+
+	r, err := req.MakeRequest()
+	if err != nil {
+		return err
 	}
 
-	resp, d, errs := req.EndBytes()
-	fmt.Println(string(d))
-	return checkError(resp, d, errs)
+	u, _ := url.Parse(req.Url)
+	signature := instance.GetSign(r.Method, u.RequestURI(), r.Header)
+	r.Header.Set("authorization", fmt.Sprintf("ONF %s:%s", instance.AccessKey, signature))
+
+	if req.Debug {
+		dump, err := httputil.DumpRequest(r, true)
+		if err != nil {
+			return err
+		}
+		fmt.Println(string(dump))
+	}
+
+	// Send request
+	resp, err := req.Client.Do(r)
+	if err != nil {
+		return err
+	}
+	defer resp.Body.Close()
+
+	body, err := ioutil.ReadAll(resp.Body)
+	// Reset resp.Body so it can be use again
+	resp.Body = ioutil.NopCloser(bytes.NewBuffer(body))
+	fmt.Println(string(body))
+	return checkError(resp, body, []error{err})
 }

@@ -2,14 +2,13 @@ package api
 
 import (
 	"fmt"
+	"github.com/OnFinality-io/onf-cli/pkg/base"
+	"github.com/parnurzeal/gorequest"
+	"github.com/spf13/viper"
 	"net/http"
 	"net/url"
 	"strings"
 	"time"
-
-	"github.com/OnFinality-io/onf-cli/pkg/base"
-	"github.com/parnurzeal/gorequest"
-	"github.com/spf13/viper"
 )
 
 type Method string
@@ -24,20 +23,20 @@ const (
 type Api struct {
 	req       *gorequest.SuperAgent
 	baseURL   string
-	accessKey string
+	AccessKey string
 	secretKey string
 }
 
 func New(accessKey, secretKey string) *Api {
 	baseURL := base.BaseUrl()
 	req := gorequest.New()
-	req.Header.Set("content-type", "application/json")
+	req.Type("json")
 	req.Header.Set("x-onf-client", viper.GetString("app.name"))
 	req.Header.Set("x-onf-version", viper.GetString("app.version"))
 	return &Api{
 		baseURL:   baseURL,
 		req:       req,
-		accessKey: accessKey,
+		AccessKey: accessKey,
 		secretKey: secretKey,
 	}
 }
@@ -45,6 +44,7 @@ func New(accessKey, secretKey string) *Api {
 type RequestOptions struct {
 	Params map[string]string
 	Body   interface{}
+	Files  map[string]string
 }
 
 func (a *Api) Request(method Method, path string, opts *RequestOptions) *gorequest.SuperAgent {
@@ -52,6 +52,7 @@ func (a *Api) Request(method Method, path string, opts *RequestOptions) *goreque
 
 	u, _ := url.Parse(fmt.Sprintf("%s%s", a.baseURL, path))
 	m := string(method)
+	r = r.CustomMethod(m, u.String())
 
 	if opts != nil {
 		if opts.Params != nil {
@@ -67,26 +68,31 @@ func (a *Api) Request(method Method, path string, opts *RequestOptions) *goreque
 
 	// set date in GMT format
 	r.Header.Set("date", time.Now().UTC().Format(http.TimeFormat))
+	signature := a.GetSign(r.Method, u.RequestURI(), r.Header)
+	r.Header.Set("authorization", fmt.Sprintf("ONF %s:%s", a.AccessKey, signature))
 
-	data := strings.Join([]string{
-		m,
-		r.Header.Get("content-type"),
-		r.Header.Get("content-md5"),
-		r.Header.Get("date"),
-		canonicalize(r.Header, "x-onf-"),
-		u.RequestURI(),
-	}, "\n")
-	signature := sign(data, a.secretKey)
-	r.Header.Set("authorization", fmt.Sprintf("ONF %s:%s", a.accessKey, signature))
-
-	return r.CustomMethod(m, u.String())
+	return r
 }
 
 func (a *Api) Upload(path string, opts *RequestOptions) *gorequest.SuperAgent {
-	// overwrite content-type
-	contentTypeKey := "content-type"
-	originalContentType := a.req.Header.Get(contentTypeKey)
-	a.req.Header.Set(contentTypeKey, "multipart/form-data; boundary=WebAppBoundary")
-	defer a.req.Header.Set(contentTypeKey, originalContentType)
-	return a.Request(MethodPost, path, opts)
+	r := a.Request(MethodPost, path, opts)
+	if len(opts.Files) > 0 {
+		r.Type("multipart")
+		for n, f := range opts.Files {
+			r.SendFile(f, n, "files")
+		}
+	}
+	return r
+}
+
+func (a *Api) GetSign(method, uri string, header http.Header) string {
+	data := strings.Join([]string{
+		method,
+		header.Get("content-type"),
+		header.Get("content-md5"),
+		header.Get("date"),
+		canonicalize(header, "x-onf-"),
+		uri,
+	}, "\n")
+	return sign(data, a.secretKey)
 }

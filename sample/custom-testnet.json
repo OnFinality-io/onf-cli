@@ -1,0 +1,14 @@
+{
+  "name": "sample-testnet",
+  "displayName": "Sample Testnet",
+  "protocol": "substrate",
+  "imageRepository": "parity/substrate",
+  "metadata": {
+    "recommend": {
+      "imageVersion": "2.0.0-533bbbd",
+      "nodeSpec": "medium",
+      "storageSize": "30Gi"
+    },
+    "bootnodes": "123123"
+  }
+}
