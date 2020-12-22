@@ -9,7 +9,7 @@
         "imageVersion": "2.0.0-533bbbd"
       }
     },
-    "chainSpec": "./chain.json"
+    "chainSpec": "./sample/chainspec.json"
   },
   "validator": {
     "count": 3,

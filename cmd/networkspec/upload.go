@@ -21,11 +21,12 @@ func UploadCmd() *cobra.Command {
 					fmt.Println(err.Error())
 					return
 				}
-				err = service.UploadChainSpec(wsID, networkID, files)
+				ret, err := service.UploadChainSpec(wsID, networkID, files)
 				if err != nil {
 					fmt.Println(err.Error())
 					return
 				}
+				fmt.Println(string(ret))
 			}
 		},
 	}

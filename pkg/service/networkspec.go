@@ -139,7 +139,7 @@ func BootstrapChainSpec(wsID int64, networkID string, payload *BootstrapChainSpe
 	return node, checkError(resp, d, errs)
 }
 
-func UploadChainSpec(wsID int64, networkID string, files []string) error {
+func UploadChainSpec(wsID int64, networkID string, files []string) ([]byte, error) {
 	path := fmt.Sprintf("/workspaces/%d/private-chains/%s/chainSpec/upload", wsID, networkID)
 	req := instance.Upload(path, &api.RequestOptions{Files: map[string]string{
 		"chainspec.json": files[0],
@@ -148,7 +148,7 @@ func UploadChainSpec(wsID int64, networkID string, files []string) error {
 
 	r, err := req.MakeRequest()
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	u, _ := url.Parse(req.Url)
@@ -158,7 +158,7 @@ func UploadChainSpec(wsID int64, networkID string, files []string) error {
 	if req.Debug {
 		dump, err := httputil.DumpRequest(r, true)
 		if err != nil {
-			return err
+			return nil, err
 		}
 		fmt.Println(string(dump))
 	}
@@ -166,15 +166,14 @@ func UploadChainSpec(wsID int64, networkID string, files []string) error {
 	// Send request
 	resp, err := req.Client.Do(r)
 	if err != nil {
-		return err
+		return nil, err
 	}
 	defer resp.Body.Close()
 
 	body, err := ioutil.ReadAll(resp.Body)
 	// Reset resp.Body so it can be use again
 	resp.Body = ioutil.NopCloser(bytes.NewBuffer(body))
-	fmt.Println(string(body))
-	return checkError(resp, body, []error{err})
+	return body, checkError(resp, body, []error{err})
 }
 
 func UpdateNetworkSpecMetadata(wsID int64, networkID string, metadata *NetworkSpecMetadata) error {

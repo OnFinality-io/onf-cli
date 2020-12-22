@@ -1,6 +1,7 @@
 package network
 
 import (
+	"encoding/json"
 	"fmt"
 
 	"github.com/OnFinality-io/onf-cli/cmd/helpers"
@@ -20,16 +21,32 @@ func bootstrapCmd() *cobra.Command {
 				fmt.Println(err.Error())
 				return
 			}
+
+			// setup workspace id
+			wsID, err = helpers.GetWorkspaceID(cmd)
+			if err != nil {
+				fmt.Println(err.Error())
+				return
+			}
+
 			// create networkspec if exist in config
-			fmt.Println(&bootstrap.NetworkSpec.Config)
 			networkSpecEntity, err := CreateNetworkSpec(&bootstrap.NetworkSpec.Config)
 			if err != nil {
 				fmt.Println(err.Error())
 				return
 			}
-			fmt.Println(networkSpecEntity)
-			// 	upload chainspec
 
+			// 	upload chainspec
+			chainspecFile := bootstrap.NetworkSpec.ChainSpec
+			ret, err := UploadChanSpec(networkSpecEntity, []string{chainspecFile})
+			if err != nil {
+				fmt.Println(err.Error())
+				return
+			}
+			if ret.Success {
+				// Continue the follow-up process
+				fmt.Println(ret)
+			}
 			// loop to create validators from config
 			// monitor validator node running status
 			// update session key for each node
@@ -59,4 +76,22 @@ func CreateNetworkSpec(payload *service.CreateNetworkSpecPayload) (*service.Netw
 		return nil, err
 	}
 	return specs, nil
+}
+
+type UploadResult struct {
+	Success bool `json:"success"`
+}
+
+func UploadChanSpec(networkSpecEntity *service.NetworkSpecEntity, files []string) (*UploadResult, error) {
+	networkID := networkSpecEntity.Key
+	ret, err := service.UploadChainSpec(wsID, networkID, files)
+	if err != nil {
+		return nil, err
+	}
+	uploadRet := &UploadResult{}
+	err = json.Unmarshal(ret, uploadRet)
+	if err != nil {
+		return nil, err
+	}
+	return uploadRet, nil
 }
