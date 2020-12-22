@@ -1,0 +1,41 @@
+{
+  "networkSpec": {
+    "config": {
+      "name": "sample-testnet",
+      "displayName": "Sample Testnet",
+      "protocol": "substrate",
+      "imageRepository": "parity/substrate",
+      "metadata": {
+        "imageVersion": "2.0.0-533bbbd"
+      }
+    },
+    "chainSpec": "./chain.json"
+  },
+  "validator": {
+    "count": 3,
+    "node": {
+      "nodeName": "boostrap-validator",
+      "clusterKey": "sy",
+      "nodeSpecKey": "medium",
+      "initFromBackup": false,
+      "publicPort": true,
+      "useApiKey": true
+    },
+    "sessionsKey": [
+      {},
+      {},
+      {},
+    ]
+  },
+  "bootNode": {
+    "count": 3,
+    "node": {
+      "nodeName": "boostrap-bootnode",
+      "clusterKey": "sy",
+      "nodeSpecKey": "medium",
+      "initFromBackup": false,
+      "publicPort": true,
+      "useApiKey": true
+    }
+  }
+}
