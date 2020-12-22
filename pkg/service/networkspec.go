@@ -13,7 +13,10 @@ import (
 )
 
 type NetworkSpecMetadata struct {
-	ChainSpec string `json:"chainspec"`
+	ChainSpec    *string  `json:"chainspec,omitempty"`
+	ImageVersion *string  `json:"imageVersion,omitempty"`
+	VersionList  []string `json:"versionList,omitempty"`
+	BootNodes    []string `json:"bootnodes,omitempty"`
 }
 
 type NetworkSpec struct {
@@ -98,10 +101,11 @@ func CreateNetworkSpecs(wsID int64, payload *CreateNetworkSpecPayload) (*Network
 	}).EndStruct(node)
 	return node, checkError(resp, d, errs)
 }
+
 func DeleteNetworkSpecs(wsID int64, networkID string) error {
 	path := fmt.Sprintf("/workspaces/%d/network-specs/%s", wsID, networkID)
-	resp, d, errs := instance.Request(api.MethodDelete, path, nil).End()
-	return checkError(resp, []byte(d), errs)
+	resp, d, errs := instance.Request(api.MethodDelete, path, nil).EndBytes()
+	return checkError(resp, d, errs)
 }
 
 func GetNetworkSpec(wsID int64, networkID string) (*NetworkSpec, error) {
@@ -171,4 +175,12 @@ func UploadChainSpec(wsID int64, networkID string, files []string) error {
 	resp.Body = ioutil.NopCloser(bytes.NewBuffer(body))
 	fmt.Println(string(body))
 	return checkError(resp, body, []error{err})
+}
+
+func UpdateNetworkSpecMetadata(wsID int64, networkID string, metadata *NetworkSpecMetadata) error {
+	path := fmt.Sprintf("/workspaces/%d/network-spec/%s/metadata", wsID, networkID)
+	resp, d, errs := instance.Request(api.MethodPost, path, &api.RequestOptions{
+		Body: metadata,
+	}).EndBytes()
+	return checkError(resp, d, errs)
 }
