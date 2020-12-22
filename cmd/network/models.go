@@ -3,42 +3,23 @@ package network
 import "github.com/OnFinality-io/onf-cli/pkg/service"
 
 type Bootstrap struct {
-	NetworkSpec NetworkSpec `json:"networkSpec"`
-	Validator   Validator   `json:"validator"`
-	BootNode    BootNode    `json:"bootNode"`
+	NetworkSpec CfgNetworkSpec `json:"networkSpec"`
+	Validator   CfgValidator   `json:"validator"`
+	BootNode    CfgBootNode    `json:"bootNode"`
 }
 
-type NetworkSpec struct {
+type CfgNetworkSpec struct {
 	Config    service.CreateNetworkSpecPayload `json:"config"`
 	ChainSpec string                           `json:"chainSpec"`
 }
-type Node struct {
-	NodeName       string `json:"nodeName"`
-	ClusterKey     string `json:"clusterKey"`
-	NodeSpecKey    string `json:"nodeSpecKey"`
-	InitFromBackup bool   `json:"initFromBackup"`
-	PublicPort     bool   `json:"publicPort"`
-	UseAPIKey      bool   `json:"useApiKey"`
-}
-type Gran struct {
-	Phrase    string `json:"phrase"`
-	PublicKey string `json:"publicKey"`
-}
-type Arua struct {
-	Phrase    string `json:"phrase"`
-	PublicKey string `json:"publicKey"`
+
+type CfgValidator struct {
+	Count       int                       `json:"count"`
+	Node        service.CreateNodePayload `json:"node"`
+	SessionsKey [][]service.SessionKey    `json:"sessionsKey"`
 }
 
-type SessionsKey struct {
-	Gran Gran `json:"gran"`
-	Arua Arua `json:"arua"`
-}
-type Validator struct {
-	Count       int           `json:"count"`
-	Node        Node          `json:"node"`
-	SessionsKey []SessionsKey `json:"sessionsKey"`
-}
-type BootNode struct {
-	Count int  `json:"count"`
-	Node  Node `json:"node"`
+type CfgBootNode struct {
+	Count int                       `json:"count"`
+	Node  service.CreateNodePayload `json:"node"`
 }

@@ -5,9 +5,9 @@ import (
 )
 
 type SessionKey struct {
-	Scheme    string
-	Phrase    string
-	PublicKey string
+	Scheme    string `json:"scheme"`
+	Phrase    string `json:"phrase"`
+	PublicKey string `json:"publicKey"`
 }
 
 func InsertSessionKey(url string, key *SessionKey) error {

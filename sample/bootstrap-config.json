@@ -22,18 +22,22 @@
       "useApiKey": true
     },
     "sessionsKey": [
-      {
-        "gran": {
-          "phrase": "",
-          "publicKey": ""
+      [
+        {
+          "scheme": "",
+          "publicKey": "",
+          "phrase": ","
         },
-        "arua": {
-          "phrase": "",
-          "publicKey": ""
-        }
-      },
-      {},
-      {}
+        {}
+      ],
+      [
+        {},
+        {}
+      ],
+      [
+        {},
+        {}
+      ]
     ]
   },
   "bootNode": {
