@@ -30,7 +30,7 @@ type Api struct {
 func New(accessKey, secretKey string) *Api {
 	baseURL := base.BaseUrl()
 	req := gorequest.New()
-	req.Type("json")
+	req.Header.Set("content-type", "application/json")
 	req.Header.Set("x-onf-client", viper.GetString("app.name"))
 	req.Header.Set("x-onf-version", viper.GetString("app.version"))
 	return &Api{
@@ -76,11 +76,10 @@ func (a *Api) Request(method Method, path string, opts *RequestOptions) *goreque
 
 func (a *Api) Upload(path string, opts *RequestOptions) *gorequest.SuperAgent {
 	r := a.Request(MethodPost, path, opts)
-	if len(opts.Files) > 0 {
-		r.Type("multipart")
-		for n, f := range opts.Files {
-			r.SendFile(f, n, "files")
-		}
+	r.Header.Del("content-type")
+	r.Type("multipart")
+	for n, f := range opts.Files {
+		r.SendFile(f, n, "files")
 	}
 	return r
 }
