@@ -3,9 +3,11 @@ package main
 import (
 	"errors"
 	"fmt"
-	"github.com/OnFinality-io/onf-cli/cmd/networkspec"
 	"log"
 	"path"
+
+	"github.com/OnFinality-io/onf-cli/cmd/network"
+	"github.com/OnFinality-io/onf-cli/cmd/networkspec"
 
 	"github.com/OnFinality-io/onf-cli/cmd/info"
 	"github.com/OnFinality-io/onf-cli/cmd/node"
@@ -77,6 +79,7 @@ func main() {
 		networkspec.NewCmd(),
 		info.NewCmd(),
 		setup.NewCmd(),
+		network.NewCmd(),
 	)
 	if err := rootCmd.Execute(); err != nil {
 		fmt.Println(err)
