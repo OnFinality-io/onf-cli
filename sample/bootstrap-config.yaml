@@ -1,3 +1,4 @@
+---
 networkSpec:
   config:
     name: sample-testnet
@@ -18,7 +19,9 @@ validator:
     publicPort: true
     useApiKey: true
   sessionsKey:
-    - {}
+    - scheme: gran
+      phrase: ''
+      publicKey: ''
     - {}
     - {}
 

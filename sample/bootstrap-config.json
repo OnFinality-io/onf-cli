@@ -22,9 +22,13 @@
       "useApiKey": true
     },
     "sessionsKey": [
+      {
+        "scheme": "gran",
+        "phrase": "",
+        "publicKey": ""
+      },
       {},
-      {},
-      {},
+      {}
     ]
   },
   "bootNode": {
