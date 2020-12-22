@@ -1,4 +1,4 @@
-package node
+package network
 
 import (
 	"github.com/spf13/cobra"
