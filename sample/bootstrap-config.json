@@ -14,10 +14,11 @@
   "validator": {
     "count": 3,
     "node": {
-      "nodeName": "boostrap-validator",
+      "nodeName": "my-validator",
       "clusterKey": "sy",
       "nodeSpecKey": "medium",
-      "initFromBackup": false,
+      "networkSpecKey": "kusama",
+      "initFromBackup": true,
       "publicPort": true,
       "useApiKey": true
     },
@@ -41,12 +42,13 @@
     ]
   },
   "bootNode": {
-    "count": 3,
+    "count": 1,
     "node": {
-      "nodeName": "boostrap-bootnode",
+      "nodeName": "my-boot-node",
       "clusterKey": "sy",
       "nodeSpecKey": "medium",
-      "initFromBackup": false,
+      "networkSpecKey": "kusama",
+      "initFromBackup": true,
       "publicPort": true,
       "useApiKey": true
     }

@@ -7,7 +7,6 @@ import (
 	"io/ioutil"
 	"net/http/httputil"
 	"net/url"
-	"time"
 
 	"github.com/OnFinality-io/onf-cli/pkg/api"
 )
@@ -43,23 +42,6 @@ type CreateMetadata struct {
 	ImageVersion string `json:"imageVersion"`
 }
 
-type NetworkSpecEntity struct {
-	Key             string    `json:"key" header:"Key"`
-	Name            string    `json:"name" header:"Name"`
-	DisplayName     string    `json:"displayName" `
-	ProtocolKey     string    `json:"protocolKey" `
-	IsSystem        bool      `json:"isSystem" header:"IsSystem"`
-	ImageRepository string    `json:"imageRepository" header:"Image"`
-	WorkspaceID     string    `json:"workspaceId" `
-	Metadata        Metadata  `json:"metadata" header:"Metadata"`
-	Status          string    `json:"status" header:"Status"`
-	CreatedAt       time.Time `json:"createdAt" `
-	UpdatedAt       time.Time `json:"updatedAt" `
-}
-type Metadata struct {
-	Chainspec string `json:"chainspec" header:"chainspec"`
-}
-
 type GenerateChainSpecPayload struct {
 	ImageVersion string   `json:"imageVersion" `
 	CliArgs      []string `json:"cliArgs" `
@@ -93,9 +75,9 @@ func GetNetworkSpecs(wsID int64) ([]NetworkSpec, error) {
 	return specs, checkError(resp, d, errs)
 }
 
-func CreateNetworkSpecs(wsID int64, payload *CreateNetworkSpecPayload) (*NetworkSpecEntity, error) {
+func CreateNetworkSpecs(wsID int64, payload *CreateNetworkSpecPayload) (*NetworkSpec, error) {
 	path := fmt.Sprintf("/workspaces/%d/network-specs", wsID)
-	node := &NetworkSpecEntity{}
+	node := &NetworkSpec{}
 	resp, d, errs := instance.Request(api.MethodPost, path, &api.RequestOptions{
 		Body: payload,
 	}).EndStruct(node)
@@ -130,9 +112,9 @@ func GenerateChainSpec(wsID int64, networkID string, payload *GenerateChainSpecP
 	}
 	return result, checkError(resp, d, errs)
 }
-func BootstrapChainSpec(wsID int64, networkID string, payload *BootstrapChainSpecPayload) (*NetworkSpecEntity, error) {
+func BootstrapChainSpec(wsID int64, networkID string, payload *BootstrapChainSpecPayload) (*NetworkSpec, error) {
 	path := fmt.Sprintf("/workspaces/%d/private-chains/%s/bootstrap", wsID, networkID)
-	node := &NetworkSpecEntity{}
+	node := &NetworkSpec{}
 	resp, d, errs := instance.Request(api.MethodPost, path, &api.RequestOptions{
 		Body: payload,
 	}).EndStruct(node)

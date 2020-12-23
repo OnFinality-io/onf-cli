@@ -14,12 +14,12 @@ type CfgNetworkSpec struct {
 }
 
 type CfgValidator struct {
-	Count       int                       `json:"count"`
-	Node        service.CreateNodePayload `json:"node"`
-	SessionsKey [][]service.SessionKey    `json:"sessionsKey"`
+	Count       int                        `json:"count"`
+	Node        *service.CreateNodePayload `json:"node"`
+	SessionsKey [][]service.SessionKey     `json:"sessionsKey"`
 }
 
 type CfgBootNode struct {
-	Count int                       `json:"count"`
-	Node  service.CreateNodePayload `json:"node"`
+	Count int                        `json:"count"`
+	Node  *service.CreateNodePayload `json:"node"`
 }
