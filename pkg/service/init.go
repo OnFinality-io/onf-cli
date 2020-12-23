@@ -15,7 +15,7 @@ func Init(accessKey, secretKey string) {
 }
 
 type errResponse struct {
-	Message string `json:"message"`
+	Message interface{} `json:"message"`
 }
 
 func checkError(resp gorequest.Response, data []byte, err []error) error {

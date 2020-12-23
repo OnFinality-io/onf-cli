@@ -39,7 +39,7 @@ func updateCmd() *cobra.Command {
 			fmt.Println("Successfully update node, #ID:", nodeID)
 			if nodeID > 0 {
 				watcherFlags.ToWatch(func(done chan bool) {
-					node, _ := service.GetNodeStatus(wsID, int64(nodeID))
+					node, _ := service.GetNodeStatus(wsID, nodeID)
 					if printFlags.OutputFormat != nil && *printFlags.OutputFormat != "" {
 						printer.NewWithPrintFlag(printFlags).Print(node)
 
@@ -54,7 +54,7 @@ func updateCmd() *cobra.Command {
 		},
 	}
 	c.Flags().StringVarP(&filePath, "file", "f", "", "definition file for update node, yaml or json")
-	c.Flags().Int64VarP(&nodeID, "node", "n", 0, "node id")
+	c.Flags().Uint64VarP(&nodeID, "node", "n", 0, "node id")
 	_ = c.MarkFlagRequired("node")
 	watcherFlags.AddFlags(c, "Watch for update status")
 	printFlags.AddFlags(c)

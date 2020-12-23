@@ -45,21 +45,21 @@ func GetWorkspaceList() ([]Workspace, error) {
 	return list, checkError(resp, d, errs)
 }
 
-func GetMembers(wsID int64) ([]Member, error) {
+func GetMembers(wsID uint64) ([]Member, error) {
 	var members []Member
 	path := fmt.Sprintf("/workspaces/%d/members", wsID)
 	resp, d, errs := instance.Request(api.MethodGet, path, nil).EndStruct(&members)
 	return members, checkError(resp, d, errs)
 }
 
-func GetInvitations(wsID int64) ([]InviteLog, error) {
+func GetInvitations(wsID uint64) ([]InviteLog, error) {
 	var logs []InviteLog
 	path := fmt.Sprintf("/workspaces/%d/invitations", wsID)
 	resp, d, errs := instance.Request(api.MethodGet, path, nil).EndStruct(&logs)
 	return logs, checkError(resp, d, errs)
 }
 
-func InviteMember(wsID int64, data *InviteMemberPayload) error {
+func InviteMember(wsID uint64, data *InviteMemberPayload) error {
 	path := fmt.Sprintf("/workspaces/%d/invite", wsID)
 	resp, d, errs := instance.Request(api.MethodPost, path, &api.RequestOptions{
 		Body: data,

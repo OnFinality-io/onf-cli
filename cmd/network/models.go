@@ -2,7 +2,7 @@ package network
 
 import "github.com/OnFinality-io/onf-cli/pkg/service"
 
-type Bootstrap struct {
+type CfgBootstrap struct {
 	NetworkSpec CfgNetworkSpec `json:"networkSpec"`
 	Validator   CfgValidator   `json:"validator"`
 	BootNode    CfgBootNode    `json:"bootNode"`

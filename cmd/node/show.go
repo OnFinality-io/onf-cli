@@ -30,7 +30,7 @@ func showCmd() *cobra.Command {
 
 			if watcherFlags.Watch {
 				watcherFlags.ToWatch(func(done chan bool) {
-					node, _ := service.GetNodeStatus(wsID, int64(nodeID))
+					node, _ := service.GetNodeStatus(wsID, nodeID)
 					show(cmd, printFlags)
 					if node.Status == Running {
 						done <- true
@@ -43,7 +43,7 @@ func showCmd() *cobra.Command {
 		},
 	}
 	printFlags.AddFlags(c)
-	c.Flags().Int64VarP(&nodeID, "node", "n", 0, "node id")
+	c.Flags().Uint64VarP(&nodeID, "node", "n", 0, "node id")
 	_ = c.MarkFlagRequired("node")
 	watcherFlags.AddFlags(c, "Watch for node")
 	return c
