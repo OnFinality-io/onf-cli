@@ -76,7 +76,7 @@ func bootstrapCmd() *cobra.Command {
 				go func(idx int) {
 					conf := cfg.Validator.Node
 					conf.NodeName = fmt.Sprintf("%s-%d", conf.NodeName, idx)
-					node, err := service.CreateNode(wsID, conf)
+					node, err := service.CreateNode(wsID, &conf)
 					if err != nil {
 						doError(err)
 						return
@@ -138,7 +138,7 @@ func bootstrapCmd() *cobra.Command {
 					conf.Metadata = &service.NodeMetadata{
 						ExtraArgs: extraArgs,
 					}
-					node, err := service.CreateNode(wsID, conf)
+					node, err := service.CreateNode(wsID, &conf)
 					if err != nil {
 						doError(err)
 						return

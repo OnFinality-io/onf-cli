@@ -120,7 +120,7 @@ func GenerateChainSpec(wsID uint64, networkID string, payload *GenerateChainSpec
 	}
 	return result, checkError(resp, d, errs)
 }
-func BootstrapChainSpec(wsID int64, networkID string, payload *BootstrapChainSpecPayload) (*NetworkSpec, error) {
+func BootstrapChainSpec(wsID uint64, networkID string, payload *BootstrapChainSpecPayload) (*NetworkSpec, error) {
 	path := fmt.Sprintf("/workspaces/%d/private-chains/%s/bootstrap", wsID, networkID)
 	node := &NetworkSpec{}
 	resp, d, errs := instance.Request(api.MethodPost, path, &api.RequestOptions{
