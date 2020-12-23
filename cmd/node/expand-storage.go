@@ -7,7 +7,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var storageSize int64
+var storageSize uint64
 
 func expandStorageCmd() *cobra.Command {
 	c := &cobra.Command{
@@ -26,8 +26,8 @@ func expandStorageCmd() *cobra.Command {
 			}
 		},
 	}
-	c.Flags().Int64VarP(&nodeID, "node", "n", 0, "node id")
-	c.Flags().Int64VarP(&storageSize, "size", "s", 0, "storage size (Gi)")
+	c.Flags().Uint64VarP(&nodeID, "node", "n", 0, "node id")
+	c.Flags().Uint64VarP(&storageSize, "size", "s", 0, "storage size (Gi)")
 	_ = c.MarkFlagRequired("node")
 	_ = c.MarkFlagRequired("size")
 	return c

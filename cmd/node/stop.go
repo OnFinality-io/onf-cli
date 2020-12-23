@@ -30,7 +30,7 @@ func stopCmd() *cobra.Command {
 			fmt.Println("node", nodeID, "is stopped")
 			if nodeID > 0 {
 				watcherFlags.ToWatch(func(done chan bool) {
-					node, _ := service.GetNodeStatus(wsID, int64(nodeID))
+					node, _ := service.GetNodeStatus(wsID, nodeID)
 					fmt.Println("current status is ", node.Status)
 					if printFlags.OutputFormat != nil && *printFlags.OutputFormat != "" {
 						printer.NewWithPrintFlag(printFlags).Print(node)
@@ -45,7 +45,7 @@ func stopCmd() *cobra.Command {
 			}
 		},
 	}
-	c.Flags().Int64VarP(&nodeID, "node", "n", 0, "node id")
+	c.Flags().Uint64VarP(&nodeID, "node", "n", 0, "node id")
 	_ = c.MarkFlagRequired("node")
 	watcherFlags.AddFlags(c, "Watch for stop status")
 	printFlags.AddFlags(c)

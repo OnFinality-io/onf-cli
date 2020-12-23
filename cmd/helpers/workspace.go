@@ -6,8 +6,8 @@ import (
 	"github.com/spf13/viper"
 )
 
-func GetWorkspaceID(cmd *cobra.Command) (int64, error) {
-	wsID, err := cmd.Flags().GetInt64("workspace")
+func GetWorkspaceID(cmd *cobra.Command) (uint64, error) {
+	wsID, err := cmd.Flags().GetUint64("workspace")
 	if err != nil || wsID != 0 {
 		return wsID, err
 	}
@@ -15,6 +15,6 @@ func GetWorkspaceID(cmd *cobra.Command) (int64, error) {
 	if err != nil {
 		return wsID, err
 	}
-	wsID = viper.GetInt64(fmt.Sprintf("%s.default_workspace", profile))
+	wsID = viper.GetUint64(fmt.Sprintf("%s.default_workspace", profile))
 	return wsID, nil
 }

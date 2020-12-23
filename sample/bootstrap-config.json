@@ -9,34 +9,56 @@
         "imageVersion": "2.0.0-533bbbd"
       }
     },
-    "chainSpec": "./sample/chainspec.json"
+    "chainSpec": "./chainspec.json"
   },
   "validator": {
     "count": 3,
     "node": {
       "nodeName": "boostrap-validator",
+      "nodeType": "validator",
       "clusterKey": "sy",
-      "nodeSpecKey": "medium",
+      "nodeSpecKey": "small",
       "initFromBackup": false,
       "publicPort": true,
-      "useApiKey": true
+      "useApiKey": true,
+      "storage": "10Gi"
     },
     "sessionsKey": [
       [
         {
-          "scheme": "",
-          "publicKey": "",
-          "phrase": ","
+          "scheme": "aura",
+          "publicKey": "0x08cff9d61cc8ca5048072300ea84a20e9d325952590d1f5672313f8c87bce74d",
+          "phrase": "axis rail chef error topple giggle ship wrap page ivory between example"
         },
-        {}
+        {
+          "scheme": "gran",
+          "publicKey": "0x858e3258136332e22a8be395a5453dbb39992e26bc680bda577e10cef8a3ca3a",
+          "phrase": "bus maple develop robust stock elite august crouch oppose achieve apology apart"
+        }
       ],
       [
-        {},
-        {}
+        {
+          "scheme": "aura",
+          "publicKey": "0xb2ebc25f1db238590cef92153d79584a9860ddd8da0540a61d36e68276580a3f",
+          "phrase": "silk pen woman foil once similar used spray metal century innocent leave"
+        },
+        {
+          "scheme": "gran",
+          "publicKey": "0x7775e063eb6adc3c4662abbf4c0107fa03bd86ab6004495fdb1c13016c221cd3",
+          "phrase": "post theory tourist exist believe jelly attitude shock balance author truth purchase"
+        }
       ],
       [
-        {},
-        {}
+        {
+          "scheme": "aura",
+          "publicKey": "0x80b9bd71249e1111ca340aa55f5b7e0086501f2c08cbea407758ed7f12150375",
+          "phrase": "ice donkey remind menu hotel lizard mimic wine game age license human"
+        },
+        {
+          "scheme": "gran",
+          "publicKey": "0x0b52cc81bc62eae09e2425f2147770773dbe2419774d6d5d3132df70fe48cef8",
+          "phrase": "frozen reduce mixture doctor demand outside sport media solid father you economy"
+        }
       ]
     ]
   },
@@ -44,11 +66,13 @@
     "count": 3,
     "node": {
       "nodeName": "boostrap-bootnode",
+      "nodeType": "full",
       "clusterKey": "sy",
-      "nodeSpecKey": "medium",
+      "nodeSpecKey": "small",
       "initFromBackup": false,
       "publicPort": true,
-      "useApiKey": true
+      "useApiKey": true,
+      "storage": "10Gi"
     }
   }
 }

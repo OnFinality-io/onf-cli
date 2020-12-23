@@ -12,11 +12,16 @@ import (
 	"github.com/OnFinality-io/onf-cli/pkg/api"
 )
 
+type BootNode struct {
+	NodeID  *string `json:"nodeId,omitempty"`
+	Address *string `json:"address,omitempty"`
+}
+
 type NetworkSpecMetadata struct {
-	ChainSpec    *string  `json:"chainspec,omitempty"`
-	ImageVersion *string  `json:"imageVersion,omitempty"`
-	VersionList  []string `json:"versionList,omitempty"`
-	BootNodes    []string `json:"bootnodes,omitempty"`
+	ChainSpec    *string    `json:"chainspec,omitempty"`
+	ImageVersion *string    `json:"imageVersion,omitempty"`
+	VersionList  []string   `json:"versionList,omitempty"`
+	BootNodes    []BootNode `json:"bootnodes,omitempty"`
 }
 
 type NetworkSpec struct {
@@ -28,7 +33,9 @@ type NetworkSpec struct {
 	ImageRepository string              `json:"imageRepository" header:"Image"`
 	WorkspaceID     uint64              `json:"workspaceId,string"`
 	Status          string              `json:"status"`
-	Metadata        NetworkSpecMetadata `json:"metadata"`
+	Metadata        NetworkSpecMetadata `json:"metadata"  header:"Status"`
+	CreatedAt       time.Time           `json:"createdAt" `
+	UpdatedAt       time.Time           `json:"updatedAt" `
 }
 
 type CreateNetworkSpecPayload struct {
@@ -44,17 +51,17 @@ type CreateMetadata struct {
 }
 
 type NetworkSpecEntity struct {
-	Key             string    `json:"key" header:"Key"`
-	Name            string    `json:"name" header:"Name"`
-	DisplayName     string    `json:"displayName" `
-	ProtocolKey     string    `json:"protocolKey" `
-	IsSystem        bool      `json:"isSystem" header:"IsSystem"`
-	ImageRepository string    `json:"imageRepository" header:"Image"`
-	WorkspaceID     string    `json:"workspaceId" `
-	Metadata        Metadata  `json:"metadata" header:"Metadata"`
-	Status          string    `json:"status" header:"Status"`
-	CreatedAt       time.Time `json:"createdAt" `
-	UpdatedAt       time.Time `json:"updatedAt" `
+	Key             string              `json:"key" header:"Key"`
+	Name            string              `json:"name" header:"Name"`
+	DisplayName     string              `json:"displayName" `
+	ProtocolKey     string              `json:"protocolKey" `
+	IsSystem        bool                `json:"isSystem" header:"IsSystem"`
+	ImageRepository string              `json:"imageRepository" header:"Image"`
+	WorkspaceID     string              `json:"workspaceId" `
+	Metadata        NetworkSpecMetadata `json:"metadata" header:"Metadata"`
+	Status          string              `json:"status" header:"Status"`
+	CreatedAt       time.Time           `json:"createdAt" `
+	UpdatedAt       time.Time           `json:"updatedAt" `
 }
 type Metadata struct {
 	Chainspec string `json:"chainspec" header:"chainspec"`
@@ -86,36 +93,36 @@ type BootstrapChainSpecNode struct {
 	Metadata BootstrapChainSpecMetadata `json:"metadata"`
 }
 
-func GetNetworkSpecs(wsID int64) ([]NetworkSpec, error) {
+func GetNetworkSpecs(wsID uint64) ([]NetworkSpec, error) {
 	var specs []NetworkSpec
 	path := fmt.Sprintf("/workspaces/%d/network-specs", wsID)
 	resp, d, errs := instance.Request(api.MethodGet, path, nil).EndStruct(&specs)
 	return specs, checkError(resp, d, errs)
 }
 
-func CreateNetworkSpecs(wsID int64, payload *CreateNetworkSpecPayload) (*NetworkSpecEntity, error) {
+func CreateNetworkSpecs(wsID uint64, payload *CreateNetworkSpecPayload) (*NetworkSpec, error) {
 	path := fmt.Sprintf("/workspaces/%d/network-specs", wsID)
-	node := &NetworkSpecEntity{}
+	spec := &NetworkSpec{}
 	resp, d, errs := instance.Request(api.MethodPost, path, &api.RequestOptions{
 		Body: payload,
-	}).EndStruct(node)
-	return node, checkError(resp, d, errs)
+	}).EndStruct(spec)
+	return spec, checkError(resp, d, errs)
 }
 
-func DeleteNetworkSpecs(wsID int64, networkID string) error {
+func DeleteNetworkSpecs(wsID uint64, networkID string) error {
 	path := fmt.Sprintf("/workspaces/%d/network-specs/%s", wsID, networkID)
 	resp, d, errs := instance.Request(api.MethodDelete, path, nil).EndBytes()
 	return checkError(resp, d, errs)
 }
 
-func GetNetworkSpec(wsID int64, networkID string) (*NetworkSpec, error) {
+func GetNetworkSpec(wsID uint64, networkID string) (*NetworkSpec, error) {
 	var specs *NetworkSpec
 	path := fmt.Sprintf("/workspaces/%d/network-specs/%s", wsID, networkID)
 	resp, d, errs := instance.Request(api.MethodGet, path, nil).EndStruct(&specs)
 	return specs, checkError(resp, d, errs)
 }
 
-func GenerateChainSpec(wsID int64, networkID string, payload *GenerateChainSpecPayload) (*GenerateChainSpecResult, error) {
+func GenerateChainSpec(wsID uint64, networkID string, payload *GenerateChainSpecPayload) (*GenerateChainSpecResult, error) {
 	var result *GenerateChainSpecResult
 	path := fmt.Sprintf("/workspaces/%d/private-chains/%s/chainSpec/generate", wsID, networkID)
 
@@ -130,7 +137,7 @@ func GenerateChainSpec(wsID int64, networkID string, payload *GenerateChainSpecP
 	}
 	return result, checkError(resp, d, errs)
 }
-func BootstrapChainSpec(wsID int64, networkID string, payload *BootstrapChainSpecPayload) (*NetworkSpecEntity, error) {
+func BootstrapChainSpec(wsID uint64, networkID string, payload *BootstrapChainSpecPayload) (*NetworkSpecEntity, error) {
 	path := fmt.Sprintf("/workspaces/%d/private-chains/%s/bootstrap", wsID, networkID)
 	node := &NetworkSpecEntity{}
 	resp, d, errs := instance.Request(api.MethodPost, path, &api.RequestOptions{
@@ -139,7 +146,11 @@ func BootstrapChainSpec(wsID int64, networkID string, payload *BootstrapChainSpe
 	return node, checkError(resp, d, errs)
 }
 
-func UploadChainSpec(wsID int64, networkID string, files []string) ([]byte, error) {
+type UploadResult struct {
+	Success bool `json:"success"`
+}
+
+func UploadChainSpec(wsID uint64, networkID string, files []string) (*UploadResult, error) {
 	path := fmt.Sprintf("/workspaces/%d/private-chains/%s/chainSpec/upload", wsID, networkID)
 	req := instance.Upload(path, &api.RequestOptions{Files: map[string]string{
 		"chainspec.json": files[0],
@@ -173,13 +184,23 @@ func UploadChainSpec(wsID int64, networkID string, files []string) ([]byte, erro
 	body, err := ioutil.ReadAll(resp.Body)
 	// Reset resp.Body so it can be use again
 	resp.Body = ioutil.NopCloser(bytes.NewBuffer(body))
-	return body, checkError(resp, body, []error{err})
+
+	if err := checkError(resp, body, []error{err}); err != nil {
+		return nil, err
+	}
+	uploadRet := &UploadResult{}
+	err = json.Unmarshal(body, uploadRet)
+	if err != nil {
+		return nil, err
+	}
+	return uploadRet, nil
 }
 
-func UpdateNetworkSpecMetadata(wsID int64, networkID string, metadata *NetworkSpecMetadata) error {
-	path := fmt.Sprintf("/workspaces/%d/network-spec/%s/metadata", wsID, networkID)
+func UpdateNetworkSpecMetadata(wsID uint64, networkID string, metadata *NetworkSpecMetadata) error {
+	path := fmt.Sprintf("/workspaces/%d/network-specs/%s/metadata", wsID, networkID)
 	resp, d, errs := instance.Request(api.MethodPost, path, &api.RequestOptions{
 		Body: metadata,
 	}).EndBytes()
+	fmt.Println(string(d))
 	return checkError(resp, d, errs)
 }

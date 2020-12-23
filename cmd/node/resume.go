@@ -25,7 +25,7 @@ func resumeCmd() *cobra.Command {
 			fmt.Println("node", nodeID, "is resumed")
 		},
 	}
-	c.Flags().Int64VarP(&nodeID, "node", "n", 0, "node id")
+	c.Flags().Uint64VarP(&nodeID, "node", "n", 0, "node id")
 	_ = c.MarkFlagRequired("node")
 	return c
 }

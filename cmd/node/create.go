@@ -39,7 +39,7 @@ func createCmd() *cobra.Command {
 			fmt.Println("Successfully created node, #ID:", node.ID)
 			if node.ID > 0 {
 				watcherFlags.ToWatch(func(done chan bool) {
-					node, _ := service.GetNodeStatus(wsID, int64(node.ID))
+					node, _ := service.GetNodeStatus(wsID, node.ID)
 					if printFlags.OutputFormat != nil && *printFlags.OutputFormat != "" {
 						printer.NewWithPrintFlag(printFlags).Print(node)
 

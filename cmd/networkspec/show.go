@@ -32,7 +32,7 @@ func ShowCmd() *cobra.Command {
 		},
 	}
 	printFlags.AddFlags(cmd)
-	cmd.PersistentFlags().Int64VarP(&wsID, "workspace", "w", 0, "Workspace ID")
+	cmd.PersistentFlags().Uint64VarP(&wsID, "workspace", "w", 0, "Workspace ID")
 	cmd.Flags().StringVarP(&networkID, "network", "n", "", "Network id")
 	_ = cmd.MarkFlagRequired("network")
 	return cmd
