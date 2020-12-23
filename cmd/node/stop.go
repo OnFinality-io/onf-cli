@@ -15,7 +15,7 @@ func stopCmd() *cobra.Command {
 	printFlags := printer.NewPrintFlags()
 	c := &cobra.Command{
 		Use:   "stop",
-		Short: "stop a running node",
+		Short: "Stop a running node",
 		Run: func(cmd *cobra.Command, args []string) {
 			wsID, err := helpers.GetWorkspaceID(cmd)
 			if err != nil {

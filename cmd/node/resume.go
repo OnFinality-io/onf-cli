@@ -10,7 +10,7 @@ import (
 func resumeCmd() *cobra.Command {
 	c := &cobra.Command{
 		Use:   "resume",
-		Short: "resume a stopped node",
+		Short: "Resume a stopped node",
 		Run: func(cmd *cobra.Command, args []string) {
 			wsID, err := helpers.GetWorkspaceID(cmd)
 			if err != nil {

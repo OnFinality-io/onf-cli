@@ -15,7 +15,7 @@ func terminateCmd() *cobra.Command {
 	printFlags := printer.NewPrintFlags()
 	c := &cobra.Command{
 		Use:   "terminate",
-		Short: "terminate a node",
+		Short: "Terminate a node",
 		Run: func(cmd *cobra.Command, args []string) {
 			wsID, err := helpers.GetWorkspaceID(cmd)
 			if err != nil {

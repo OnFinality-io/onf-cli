@@ -14,7 +14,7 @@ func NodeRecommendsCmd() *cobra.Command {
 	var network string
 	c := &cobra.Command{
 		Use:   "recommend",
-		Short: "Show recommended node",
+		Short: "Show recommended node specifications",
 		Run: func(cmd *cobra.Command, args []string) {
 			if network != "" {
 				result, err := service.NodeRecommends(network)

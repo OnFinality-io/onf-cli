@@ -9,7 +9,7 @@ func listCmd() *cobra.Command {
 	printFlags := printer.NewPrintFlags()
 	c := &cobra.Command{
 		Use:   "ls",
-		Short: "Show all profile",
+		Short: "Show all profiles",
 		Run: func(cmd *cobra.Command, args []string) {
 			CredentialFile := &CredentialFile{}
 			configArray := CredentialFile.GetAllSetup()

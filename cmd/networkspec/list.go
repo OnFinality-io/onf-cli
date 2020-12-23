@@ -13,7 +13,7 @@ func listCmd() *cobra.Command {
 	printFlags := printer.NewPrintFlags()
 	c := &cobra.Command{
 		Use:   "list",
-		Short: "list all the network specs in workspace",
+		Short: "List all the network specifications in the current workspace",
 		Run: func(cmd *cobra.Command, args []string) {
 			wsID, err := helpers.GetWorkspaceID(cmd)
 			if err != nil {

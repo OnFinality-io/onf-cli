@@ -13,7 +13,7 @@ func UploadCmd() *cobra.Command {
 	var files []string
 	cmd := &cobra.Command{
 		Use:   "upload",
-		Short: "Upload chain spec",
+		Short: "Upload chain specification",
 		Run: func(cmd *cobra.Command, args []string) {
 			if networkID != "" {
 				wsID, err := helpers.GetWorkspaceID(cmd)

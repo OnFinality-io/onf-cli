@@ -13,7 +13,7 @@ func NodeSpecCmd() *cobra.Command {
 	printFlags := printer.NewPrintFlags()
 	c := &cobra.Command{
 		Use:   "node-spec",
-		Short: "Show node specs",
+		Short: "Show node specifications",
 		Run: func(cmd *cobra.Command, args []string) {
 			result, err := service.GetInfo()
 			if err != nil {

@@ -13,7 +13,7 @@ func listCmd() *cobra.Command {
 	printFlags := printer.NewPrintFlags()
 	cmd := &cobra.Command{
 		Use:   "list",
-		Short: "list all the dedicated nodes in workspace",
+		Short: "List all the dedicated nodes in the workspace",
 		Run: func(cmd *cobra.Command, args []string) {
 			wsID, err := helpers.GetWorkspaceID(cmd)
 			if err != nil {

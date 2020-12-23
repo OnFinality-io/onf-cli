@@ -10,7 +10,7 @@ import (
 func VersionCmd() *cobra.Command {
 	return &cobra.Command{
 		Use:   "version",
-		Short: "display client version",
+		Short: "Display the current client version of onf",
 		PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
 			return nil
 		},

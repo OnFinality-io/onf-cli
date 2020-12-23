@@ -24,7 +24,7 @@ func MemberCmd() *cobra.Command {
 	var wsID int64
 	c := &cobra.Command{
 		Use:   "members",
-		Short: "list all members in a given workspace",
+		Short: "List all members in a given workspace",
 		Run: func(cmd *cobra.Command, args []string) {
 			wsID, err := helpers.GetWorkspaceID(cmd)
 			if err != nil {

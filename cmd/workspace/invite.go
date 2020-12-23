@@ -14,7 +14,7 @@ func InviteCmd() *cobra.Command {
 	var wsID int64
 	c := &cobra.Command{
 		Use:   "invite",
-		Short: "invite a new member to join the workspace",
+		Short: "Invite a new member to join the workspace",
 		Run: func(cmd *cobra.Command, args []string) {
 			wsID, err := helpers.GetWorkspaceID(cmd)
 			if err != nil {

@@ -13,7 +13,7 @@ func ClusterCmd() *cobra.Command {
 	printFlags := printer.NewPrintFlags()
 	c := &cobra.Command{
 		Use:   "cluster",
-		Short: "Show cluster",
+		Short: "List clusters",
 		Run: func(cmd *cobra.Command, args []string) {
 			result, err := service.GetInfo()
 			if err != nil {

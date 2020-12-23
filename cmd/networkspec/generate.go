@@ -14,7 +14,7 @@ func GenerateCmd() *cobra.Command {
 	printFlags := printer.NewPrintFlags()
 	cmd := &cobra.Command{
 		Use:   "generate",
-		Short: "Generate chanspec for the network",
+		Short: "Generate chainspec for the network",
 		Run: func(cmd *cobra.Command, args []string) {
 			if networkID != "" {
 				wsID, err := helpers.GetWorkspaceID(cmd)

@@ -14,7 +14,7 @@ func BootstrapCmd() *cobra.Command {
 	printFlags := printer.NewPrintFlags()
 	c := &cobra.Command{
 		Use:   "bootstrap",
-		Short: "bootstrap chain spec",
+		Short: "Bootstrap chain spec",
 		Run: func(cmd *cobra.Command, args []string) {
 			wsID, err := helpers.GetWorkspaceID(cmd)
 			if err != nil {

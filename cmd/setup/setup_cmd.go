@@ -16,7 +16,7 @@ import (
 func NewCmd() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "setup",
-		Short: "initialize the configuration",
+		Short: "Initialize the configuration",
 		PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
 			return nil
 		},

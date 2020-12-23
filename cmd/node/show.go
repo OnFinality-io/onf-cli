@@ -25,7 +25,7 @@ func showCmd() *cobra.Command {
 	printFlags := printer.NewPrintFlags()
 	c := &cobra.Command{
 		Use:   "show",
-		Short: "show the detail information on a given node",
+		Short: "Show the detailed information on a given node",
 		Run: func(cmd *cobra.Command, args []string) {
 
 			if watcherFlags.Watch {

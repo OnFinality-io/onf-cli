@@ -7,7 +7,7 @@ import (
 func NewCmd() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "info",
-		Short: "Get supported Clusters and NodeSpecs",
+		Short: "Get supported clusters and node specifications",
 	}
 
 	cmd.AddCommand(

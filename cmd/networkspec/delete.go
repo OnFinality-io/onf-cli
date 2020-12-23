@@ -12,7 +12,7 @@ func DeleteCmd() *cobra.Command {
 	var networkID string
 	c := &cobra.Command{
 		Use:   "delete",
-		Short: "delete a network",
+		Short: "Delete a network",
 		Run: func(cmd *cobra.Command, args []string) {
 			if networkID != "" {
 				wsID, err := helpers.GetWorkspaceID(cmd)

@@ -12,7 +12,7 @@ func ListCmd() *cobra.Command {
 	printFlags := printer.NewPrintFlags()
 	c := &cobra.Command{
 		Use:   "workspaces",
-		Short: "list all workspaces",
+		Short: "List all workspaces",
 		Run: func(cmd *cobra.Command, args []string) {
 			list, err := service.GetWorkspaceList()
 			if err != nil {

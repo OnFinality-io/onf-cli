@@ -12,7 +12,7 @@ var storageSize int64
 func expandStorageCmd() *cobra.Command {
 	c := &cobra.Command{
 		Use:   "expand-storage",
-		Short: "expand storage for a given node",
+		Short: "Expand the storage for a given node",
 		Run: func(cmd *cobra.Command, args []string) {
 			wsID, err := helpers.GetWorkspaceID(cmd)
 			if err != nil {
