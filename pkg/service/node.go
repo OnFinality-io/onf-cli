@@ -32,6 +32,12 @@ func ResumeNode(wsID, nodeID uint64) error {
 	return checkError(resp, []byte(d), errs)
 }
 
+func RestartNode(wsID, nodeID uint64) error {
+	path := fmt.Sprintf("/workspaces/%d/nodes/%d/restart", wsID, nodeID)
+	resp, d, errs := instance.Request(api.MethodPost, path, nil).End()
+	return checkError(resp, []byte(d), errs)
+}
+
 func TerminateNode(wsID, nodeID uint64) error {
 	path := fmt.Sprintf("/workspaces/%d/nodes/%d", wsID, nodeID)
 	resp, d, errs := instance.Request(api.MethodDelete, path, nil).End()
@@ -39,8 +45,8 @@ func TerminateNode(wsID, nodeID uint64) error {
 }
 
 func UpdateNode(wsID, nodeID uint64, data *UpdateNodePayload) error {
-	path := fmt.Sprintf("/workspaces/%d/nodes/%d", wsID, nodeID)
-	resp, d, errs := instance.Request(api.MethodPut, path, &api.RequestOptions{
+	path := fmt.Sprintf("/workspaces/%d/nodes/%d/update", wsID, nodeID)
+	resp, d, errs := instance.Request(api.MethodPost, path, &api.RequestOptions{
 		Body: data,
 	}).End()
 	return checkError(resp, []byte(d), errs)

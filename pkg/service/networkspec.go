@@ -20,6 +20,7 @@ type BootNode struct {
 type NetworkSpecMetadata struct {
 	ChainSpec    *string    `json:"chainspec,omitempty"`
 	ImageVersion *string    `json:"imageVersion,omitempty"`
+	Command      *string    `json:"command,omitempty"`
 	VersionList  []string   `json:"versionList,omitempty"`
 	BootNodes    []BootNode `json:"bootnodes,omitempty"`
 }
@@ -39,15 +40,11 @@ type NetworkSpec struct {
 }
 
 type CreateNetworkSpecPayload struct {
-	Name            string         `json:"name"`
-	DisplayName     string         `json:"displayName"`
-	Protocol        string         `json:"protocol"`
-	ImageRepository string         `json:"imageRepository"`
-	Metadata        CreateMetadata `json:"metadata"`
-}
-type CreateMetadata struct {
-	Chainspec    string `json:"chainspec"`
-	ImageVersion string `json:"imageVersion"`
+	Name            string              `json:"name"`
+	DisplayName     string              `json:"displayName"`
+	Protocol        string              `json:"protocol"`
+	ImageRepository string              `json:"imageRepository"`
+	Metadata        NetworkSpecMetadata `json:"metadata"`
 }
 
 type GenerateChainSpecPayload struct {
@@ -184,6 +181,5 @@ func UpdateNetworkSpecMetadata(wsID uint64, networkID string, metadata *NetworkS
 	resp, d, errs := instance.Request(api.MethodPost, path, &api.RequestOptions{
 		Body: metadata,
 	}).EndBytes()
-	fmt.Println(string(d))
 	return checkError(resp, d, errs)
 }

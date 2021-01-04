@@ -26,38 +26,38 @@
     "sessionsKey": [
       [
         {
-          "scheme": "aura",
-          "publicKey": "0x08cff9d61cc8ca5048072300ea84a20e9d325952590d1f5672313f8c87bce74d",
-          "phrase": "axis rail chef error topple giggle ship wrap page ivory between example"
+          "scheme": "babe",
+          "publicKey": "0xd43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d",
+          "phrase": "//Alice"
         },
         {
           "scheme": "gran",
-          "publicKey": "0x858e3258136332e22a8be395a5453dbb39992e26bc680bda577e10cef8a3ca3a",
-          "phrase": "bus maple develop robust stock elite august crouch oppose achieve apology apart"
+          "publicKey": "0x88dc3417d5058ec4b4503e0c12ea1a0a89be200fe98922423d4334014fa6b0ee",
+          "phrase": "//Alice"
         }
       ],
       [
         {
-          "scheme": "aura",
-          "publicKey": "0xb2ebc25f1db238590cef92153d79584a9860ddd8da0540a61d36e68276580a3f",
-          "phrase": "silk pen woman foil once similar used spray metal century innocent leave"
+          "scheme": "babe",
+          "publicKey": "0x8eaf04151687736326c9fea17e25fc5287613693c912909cb226aa4794f26a48",
+          "phrase": "//Bob"
         },
         {
           "scheme": "gran",
-          "publicKey": "0x7775e063eb6adc3c4662abbf4c0107fa03bd86ab6004495fdb1c13016c221cd3",
-          "phrase": "post theory tourist exist believe jelly attitude shock balance author truth purchase"
+          "publicKey": "0xd17c2d7823ebf260fd138f2d7e27d114c0145d968b5ff5006125f2414fadae69",
+          "phrase": "//Bob"
         }
       ],
       [
         {
-          "scheme": "aura",
-          "publicKey": "0x80b9bd71249e1111ca340aa55f5b7e0086501f2c08cbea407758ed7f12150375",
-          "phrase": "ice donkey remind menu hotel lizard mimic wine game age license human"
+          "scheme": "babe",
+          "publicKey": "0x90b5ab205c6974c9ea841be688864633dc9ca8a357843eeacf2314649965fe22",
+          "phrase": "//Charlie"
         },
         {
           "scheme": "gran",
-          "publicKey": "0x0b52cc81bc62eae09e2425f2147770773dbe2419774d6d5d3132df70fe48cef8",
-          "phrase": "frozen reduce mixture doctor demand outside sport media solid father you economy"
+          "publicKey": "0x439660b36c6c03afafca027b910b4fecf99801834c62a5e6006f27d978de234f",
+          "phrase": "//Charlie"
         }
       ]
     ]

@@ -21,6 +21,7 @@ func NewCmd() *cobra.Command {
 		updateCmd(),
 		stopCmd(),
 		resumeCmd(),
+		restartCmd(),
 		terminateCmd(),
 		expandStorageCmd(),
 	)

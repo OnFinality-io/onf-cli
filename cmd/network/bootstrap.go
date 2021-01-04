@@ -57,7 +57,7 @@ func bootstrapCmd() *cobra.Command {
 				fmt.Println("failed to upload chain spec")
 				return
 			}
-			fmt.Println("Chain spec uploaded")
+			fmt.Println("Chainspec uploaded")
 
 			// Initial operation for validator and boot node
 			cfg.Validator.Node.NetworkSpecKey = spec.Key
@@ -83,9 +83,8 @@ func bootstrapCmd() *cobra.Command {
 			// boot node startup parameter settings
 			var extraArgs []string
 			for _, validator := range validatorRet {
-				extraArgs = append(extraArgs, "--bootnodes", validator.Node.Endpoints.P2p)
+				extraArgs = append(extraArgs, fmt.Sprintf("--bootnodes=%s", validator.Node.Endpoints.P2p))
 			}
-			fmt.Println(extraArgs)
 
 			bootNodeRet := CreateBootNode(extraArgs, cfg.BootNode)
 			isInterrupted = false
@@ -117,7 +116,7 @@ func bootstrapCmd() *cobra.Command {
 			}
 			fmt.Println("Updated network spec with new bootnode list:")
 			for _, a := range bootNodeAddrs {
-				fmt.Println("\t", a)
+				fmt.Println("\t", *a.Address)
 			}
 			fmt.Println("New network launched")
 		},
@@ -198,6 +197,14 @@ func CreateValidator(cfgValidator CfgValidator) []*CreateNodeResult {
 					}
 					fmt.Println(fmt.Sprintf("Node %s (%d)'s session keys are updated", conf.NodeName, nodeDetail.ID))
 
+					err = service.RestartNode(createdNode.WorkspaceID, createdNode.ID)
+					if err != nil {
+						nodeChan <- &CreateNodeResult{Error: fmt.Errorf("failed to restart %s, err: %s", conf.NodeName, err)}
+						done <- true
+						return
+					}
+
+					fmt.Println(fmt.Sprintf("Node %s (%d) is restarted", conf.NodeName, nodeDetail.ID))
 					nodeChan <- &CreateNodeResult{Node: nodeDetail}
 					done <- true
 				default:
