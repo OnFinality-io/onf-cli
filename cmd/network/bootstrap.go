@@ -233,8 +233,12 @@ func CreateBootNode(extraArgs []string, bootNode CfgBootNode) []*CreateNodeResul
 		go func(idx int) {
 			conf := bootNode.Node
 			conf.NodeName = fmt.Sprintf("%s-%d", conf.NodeName, idx)
-			conf.Metadata = &service.NodeMetadata{
-				ExtraArgs: extraArgs,
+			if conf.Metadata != nil {
+				conf.Metadata.ExtraArgs = append(conf.Metadata.ExtraArgs, extraArgs...)
+			} else {
+				conf.Metadata = &service.NodeMetadata{
+					ExtraArgs: extraArgs,
+				}
 			}
 			node, err := service.CreateNode(wsID, &conf)
 			if err != nil {
