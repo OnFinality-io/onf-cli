@@ -10,4 +10,5 @@ const (
 	Restarting   = "restarting"
 	Terminating  = "terminating"
 	Terminated   = "terminated"
+	Error        = "error"
 )

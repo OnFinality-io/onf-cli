@@ -4,7 +4,9 @@ type Endpoints struct {
 	RPC         string `json:"rpc"`
 	WS          string `json:"ws"`
 	P2pInternal string `json:"p2p-internal"`
+	P2p         string `json:"p2p"`
 }
+
 type NodeListItem struct {
 	ID             uint64 `json:"id,string" header:"ID"`
 	Name           string `json:"name" header:"Name"`
@@ -37,12 +39,12 @@ type Node struct {
 }
 
 type NodeMetadata struct {
-	NodeKey    *string           `json:"nodeKey"`
+	NodeKey    *string           `json:"nodeKey,omitempty"`
 	SkipName   bool              `json:"skipName"`
-	ExtraArgs  []string          `json:"extraArgs"`
-	Client     *string           `json:"client"`
-	RpcMethods *string           `json:"rpcMethods"`
-	Labels     map[string]string `json:"labels"`
+	ExtraArgs  []string          `json:"extraArgs,omitempty"`
+	Client     *string           `json:"client,omitempty"`
+	RpcMethods *string           `json:"rpcMethods,omitempty"`
+	Labels     map[string]string `json:"labels,omitempty"`
 }
 
 type CreateNodePayload struct {
