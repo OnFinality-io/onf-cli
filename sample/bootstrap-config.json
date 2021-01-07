@@ -16,7 +16,7 @@
     "node": {
       "nodeName": "boostrap-validator",
       "nodeType": "validator",
-      "clusterKey": "sy",
+      "clusterKey": "jm",
       "nodeSpecKey": "small",
       "initFromBackup": false,
       "publicPort": true,
@@ -67,7 +67,7 @@
     "node": {
       "nodeName": "boostrap-bootnode",
       "nodeType": "full",
-      "clusterKey": "sy",
+      "clusterKey": "jm",
       "nodeSpecKey": "small",
       "initFromBackup": false,
       "publicPort": true,
