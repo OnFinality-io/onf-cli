@@ -25,6 +25,17 @@ type NetworkSpecMetadata struct {
 	BootNodes    []interface{} `json:"bootnodes,omitempty"`
 }
 
+type Recommend struct {
+	ImageVersion string `json:"imageVersion"`
+	NodeSpec     string `json:"nodeSpec"`
+	StorageSize  uint   `json:"storageSize"`
+}
+
+type SpecNodeType struct {
+	Key       string     `json:"key"`
+	Recommend *Recommend `json:"recommend,omitempty"`
+}
+
 type NetworkSpec struct {
 	Key             string              `json:"key" header:"Key"`
 	Name            string              `json:"name" `
@@ -37,6 +48,8 @@ type NetworkSpec struct {
 	Metadata        NetworkSpecMetadata `json:"metadata"  header:"Status"`
 	CreatedAt       time.Time           `json:"createdAt" `
 	UpdatedAt       time.Time           `json:"updatedAt" `
+	Recommend       *Recommend          `json:"recommend,omitempty"`
+	NodeTypes       []SpecNodeType      `json:"nodeTypes,omitempty"`
 }
 
 type CreateNetworkSpecPayload struct {
