@@ -11,7 +11,7 @@ var email string
 var userRole string
 
 func InviteCmd() *cobra.Command {
-	var wsID int64
+	var wsID uint64
 	c := &cobra.Command{
 		Use:   "invite",
 		Short: "Invite a new member to join the workspace",
@@ -36,7 +36,7 @@ func InviteCmd() *cobra.Command {
 			fmt.Println()
 		},
 	}
-	c.Flags().Int64VarP(&wsID, "workspace", "w", 0, "workspace id")
+	c.Flags().Uint64VarP(&wsID, "workspace", "w", 0, "workspace id")
 	c.Flags().StringVarP(&email, "email", "e", "", "email address")
 	_ = c.MarkFlagRequired("email")
 	c.Flags().StringVarP(&userRole, "role", "r", "member", "user role")

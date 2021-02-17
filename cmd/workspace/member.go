@@ -21,7 +21,7 @@ type memberView struct {
 
 func MemberCmd() *cobra.Command {
 	printFlags := printer.NewPrintFlags()
-	var wsID int64
+	var wsID uint64
 	c := &cobra.Command{
 		Use:   "members",
 		Short: "List all members in a given workspace",
@@ -85,6 +85,6 @@ func MemberCmd() *cobra.Command {
 		},
 	}
 	printFlags.AddFlags(c)
-	c.Flags().Int64VarP(&wsID, "workspace", "w", 0, "workspace id")
+	c.Flags().Uint64VarP(&wsID, "workspace", "w", 0, "workspace id")
 	return c
 }
