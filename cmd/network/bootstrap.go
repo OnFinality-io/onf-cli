@@ -100,7 +100,7 @@ func bootstrapCmd() *cobra.Command {
 			fmt.Println("Create boot nodes success")
 
 			// update network spec with new bootnode p2p address
-			var bootNodeAddrs []service.BootNode
+			var bootNodeAddrs []interface{}
 			for _, bootNode := range bootNodeRet {
 				bootNodeAddrs = append(bootNodeAddrs, service.BootNode{
 					Address: utils.String(bootNode.Node.Endpoints.P2p),
@@ -116,7 +116,7 @@ func bootstrapCmd() *cobra.Command {
 			}
 			fmt.Println("Updated network spec with new bootnode list:")
 			for _, a := range bootNodeAddrs {
-				fmt.Println("\t", *a.Address)
+				fmt.Println("\t", *a.(service.BootNode).Address)
 			}
 			fmt.Println("New network launched")
 		},

@@ -18,11 +18,11 @@ type BootNode struct {
 }
 
 type NetworkSpecMetadata struct {
-	ChainSpec    *string    `json:"chainspec,omitempty"`
-	ImageVersion *string    `json:"imageVersion,omitempty"`
-	Command      *string    `json:"command,omitempty"`
-	VersionList  []string   `json:"versionList,omitempty"`
-	BootNodes    []BootNode `json:"bootnodes,omitempty"`
+	ChainSpec    *string       `json:"chainspec,omitempty"`
+	ImageVersion *string       `json:"imageVersion,omitempty"`
+	Command      *string       `json:"command,omitempty"`
+	VersionList  []string      `json:"versionList,omitempty"`
+	BootNodes    []interface{} `json:"bootnodes,omitempty"`
 }
 
 type NetworkSpec struct {
