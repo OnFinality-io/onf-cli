@@ -27,6 +27,7 @@ func init() {
 	viper.SetDefault("app.name", "onf-cli")
 	viper.SetDefault("app.version", version)
 	viper.SetDefault("git.commit", gitCommit)
+	viper.SetDefault("default.base_url", "https://api.onfinality.io/api/v1")
 }
 
 func checkSetup() bool {
@@ -59,10 +60,11 @@ func main() {
 			loadConfig()
 			accessKey := viper.GetString(fmt.Sprintf("%s.onf_access_key", profile))
 			secretKey := viper.GetString(fmt.Sprintf("%s.onf_secret_key", profile))
+			baseURL := viper.GetString(fmt.Sprintf("%s.base_url", profile))
 			if accessKey == "" || secretKey == "" {
 				return errors.New("invalid accessKey or secretKey")
 			}
-			service.Init(accessKey, secretKey)
+			service.Init(accessKey, secretKey, baseURL)
 			return nil
 		},
 	}

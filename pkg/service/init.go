@@ -10,8 +10,8 @@ import (
 
 var instance *api.Api
 
-func Init(accessKey, secretKey string) {
-	instance = api.New(accessKey, secretKey)
+func Init(accessKey, secretKey string, baseURL string) {
+	instance = api.New(accessKey, secretKey, baseURL)
 }
 
 type errResponse struct {

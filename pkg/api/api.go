@@ -2,7 +2,6 @@ package api
 
 import (
 	"fmt"
-	"github.com/OnFinality-io/onf-cli/pkg/base"
 	"github.com/parnurzeal/gorequest"
 	"github.com/spf13/viper"
 	"net/http"
@@ -27,8 +26,7 @@ type Api struct {
 	secretKey string
 }
 
-func New(accessKey, secretKey string) *Api {
-	baseURL := base.BaseUrl()
+func New(accessKey, secretKey string, baseURL string) *Api {
 	req := gorequest.New()
 	req.Header.Set("content-type", "application/json")
 	req.Header.Set("x-onf-client", viper.GetString("app.name"))

@@ -3,6 +3,7 @@ package setup
 import (
 	"bufio"
 	"fmt"
+	"github.com/spf13/viper"
 	"os"
 	"runtime"
 	"strconv"
@@ -44,7 +45,8 @@ func Flow(section string) {
 		return
 	}
 	// workspace id key
-	service.Init(credential.AccessKey, credential.SecretKey)
+	baseURL := viper.GetString(fmt.Sprintf("%s.base_url", section))
+	service.Init(credential.AccessKey, credential.SecretKey, baseURL)
 	list, err := service.GetWorkspaceList()
 	if err != nil {
 		fmt.Printf("Get workspace err %v\n", err)
