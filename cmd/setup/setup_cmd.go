@@ -3,7 +3,6 @@ package setup
 import (
 	"bufio"
 	"fmt"
-	"github.com/spf13/viper"
 	"os"
 	"runtime"
 	"strconv"
@@ -23,11 +22,12 @@ func NewCmd() *cobra.Command {
 		},
 		Run: func(cmd *cobra.Command, args []string) {
 			profile, err := cmd.Flags().GetString("profile")
+			baseURL, err := cmd.Flags().GetString("base-url")
 			if err != nil {
 				fmt.Printf("err:%s\n", err)
 				return
 			}
-			Flow(profile)
+			Flow(profile, baseURL)
 		},
 	}
 	cmd.AddCommand(
@@ -36,7 +36,7 @@ func NewCmd() *cobra.Command {
 	return cmd
 }
 
-func Flow(section string) {
+func Flow(section string, baseURL string) {
 
 	credential := &Credential{}
 	// access key and secret key
@@ -45,7 +45,6 @@ func Flow(section string) {
 		return
 	}
 	// workspace id key
-	baseURL := viper.GetString(fmt.Sprintf("%s.base_url", section))
 	service.Init(credential.AccessKey, credential.SecretKey, baseURL)
 	list, err := service.GetWorkspaceList()
 	if err != nil {

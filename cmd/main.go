@@ -20,6 +20,7 @@ import (
 )
 
 var profile string
+var baseURL string
 var version string
 var gitCommit string
 
@@ -60,7 +61,6 @@ func main() {
 			loadConfig()
 			accessKey := viper.GetString(fmt.Sprintf("%s.onf_access_key", profile))
 			secretKey := viper.GetString(fmt.Sprintf("%s.onf_secret_key", profile))
-			baseURL := viper.GetString(fmt.Sprintf("%s.base_url", profile))
 			if accessKey == "" || secretKey == "" {
 				return errors.New("invalid accessKey or secretKey")
 			}
@@ -69,6 +69,7 @@ func main() {
 		},
 	}
 	rootCmd.PersistentFlags().StringVarP(&profile, "profile", "p", "default", "profile scope in the credentials file")
+	rootCmd.PersistentFlags().StringVar(&baseURL, "base-url", "https://api.onfinality.io/api/v1", "replace default api endpoint url")
 
 	rootCmd.AddCommand(
 		VersionCmd(),
