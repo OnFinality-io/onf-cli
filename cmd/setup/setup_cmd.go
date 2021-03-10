@@ -3,6 +3,7 @@ package setup
 import (
 	"bufio"
 	"fmt"
+	"github.com/spf13/viper"
 	"os"
 	"runtime"
 	"strconv"
@@ -22,7 +23,7 @@ func NewCmd() *cobra.Command {
 		},
 		Run: func(cmd *cobra.Command, args []string) {
 			profile, err := cmd.Flags().GetString("profile")
-			baseURL, err := cmd.Flags().GetString("base-url")
+			baseURL := viper.GetString("base_url")
 			if err != nil {
 				fmt.Printf("err:%s\n", err)
 				return
