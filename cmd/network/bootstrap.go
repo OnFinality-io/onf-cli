@@ -2,6 +2,7 @@ package network
 
 import (
 	"fmt"
+	"strconv"
 
 	"github.com/OnFinality-io/onf-cli/pkg/utils"
 	"github.com/OnFinality-io/onf-cli/pkg/watcher"
@@ -154,20 +155,32 @@ func CreateValidator(cfgValidator CfgValidator) []*CreateNodeResult {
 
 	nodeChan := make(chan *CreateNodeResult, validatorCount)
 	for i := 0; i < validatorCount; i++ {
-		go func(idx int) {
-			conf := cfgValidator.Node
-			conf.NodeName = fmt.Sprintf("%s-%d", conf.NodeName, idx)
-			createdNode, err := service.CreateNode(wsID, &conf)
+		conf := cfgValidator.Node
+		conf.NodeName = fmt.Sprintf("%s-%d", conf.NodeName, i)
+		createdNode, err := service.CreateNode(wsID, &conf)
+		if err != nil {
+			nodeChan <- &CreateNodeResult{Error: err}
+			break
+		}
+		fmt.Println(fmt.Sprintf("Node %s (%d) created", conf.NodeName, createdNode.ID))
+		if i == 0 {
+			// update networkspec
+			err = service.UpdateNetworkSpecMetadata(wsID, conf.NetworkSpecKey, &service.NetworkSpecMetadata{
+				BootNodes: []interface{}{service.BootNode{
+					NodeID: utils.String(strconv.FormatUint(createdNode.ID, 10)),
+				}},
+			})
+			fmt.Println(fmt.Sprintf("Node %s (%d) is set as bootnode", conf.NodeName, createdNode.ID))
 			if err != nil {
 				nodeChan <- &CreateNodeResult{Error: err}
-				return
+				break
 			}
-			fmt.Println(fmt.Sprintf("Node %s (%d) created", conf.NodeName, createdNode.ID))
-
+		}
+		go func(idx int, nodeId uint64) {
 			// monitor validator node running status
 			w := watcher.Watcher{Second: 10}
 			w.Run(func(done chan bool) {
-				status, _ := service.GetNodeStatus(createdNode.WorkspaceID, createdNode.ID)
+				status, _ := service.GetNodeStatus(wsID, nodeId)
 				switch status.Status {
 				case node.Terminating:
 					nodeChan <- &CreateNodeResult{Error: fmt.Errorf("create %s %s", conf.NodeName, node.Terminating)}
@@ -179,9 +192,9 @@ func CreateValidator(cfgValidator CfgValidator) []*CreateNodeResult {
 					nodeChan <- &CreateNodeResult{Error: fmt.Errorf("create %s err", conf.NodeName)}
 					done <- true
 				case node.Running:
-					fmt.Println(fmt.Sprintf("Node %s (%d) is %s", conf.NodeName, createdNode.ID, status.Status))
+					fmt.Println(fmt.Sprintf("Node %s (%d) is %s", conf.NodeName, nodeId, status.Status))
 					//TODO need to add retry
-					nodeDetail, err := service.GetNodeDetail(createdNode.WorkspaceID, createdNode.ID)
+					nodeDetail, err := service.GetNodeDetail(wsID, nodeId)
 					if err != nil {
 						nodeChan <- &CreateNodeResult{Error: fmt.Errorf("Get %s of detail %s", conf.NodeName, err)}
 						done <- true
@@ -208,17 +221,20 @@ func CreateValidator(cfgValidator CfgValidator) []*CreateNodeResult {
 					nodeChan <- &CreateNodeResult{Node: nodeDetail}
 					done <- true
 				default:
-					fmt.Println(fmt.Sprintf("Node %s (%d): %s", conf.NodeName, createdNode.ID, status.Status))
+					fmt.Println(fmt.Sprintf("Node %s (%d): %s", conf.NodeName, nodeId, status.Status))
 				}
 
 			})
-		}(i)
+		}(i, createdNode.ID)
 	}
 	nodeRet := []*CreateNodeResult{}
 	for i := 0; i < validatorCount; i++ {
 		select {
 		case ret := <-nodeChan:
 			nodeRet = append(nodeRet, ret)
+			if ret.Error != nil {
+				return nodeRet
+			}
 		}
 	}
 

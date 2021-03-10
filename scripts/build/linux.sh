@@ -1,3 +1,4 @@
+#!/bin/sh
 export GOOS=linux
 export GOARCH=amd64
 

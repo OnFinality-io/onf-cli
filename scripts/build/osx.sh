@@ -1,3 +1,4 @@
+#!/bin/sh
 export GOOS=darwin
 export GOARCH=amd64
 
