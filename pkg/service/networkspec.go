@@ -18,11 +18,17 @@ type BootNode struct {
 }
 
 type NetworkSpecMetadata struct {
-	ChainSpec    *string       `json:"chainspec,omitempty"`
-	ImageVersion *string       `json:"imageVersion,omitempty"`
-	Command      *string       `json:"command,omitempty"`
-	VersionList  []string      `json:"versionList,omitempty"`
-	BootNodes    []interface{} `json:"bootnodes,omitempty"`
+	ChainSpec        *string       `json:"chainspec,omitempty"`
+	ImageVersion     *string       `json:"imageVersion,omitempty"`
+	Command          *string       `json:"command,omitempty"`
+	VersionList      []string      `json:"versionList,omitempty"`
+	BootNodes        []interface{} `json:"bootnodes,omitempty"`
+	FetchRcChainspec *string       `json:"fetchRcChainspec,omitempty"`
+	RcChainspec      *string       `json:"rcChainspec,omitempty"`
+	RcExtraArgs      []string      `json:"rcExtraArgs,omitempty"`
+	ExtraArgs        []string      `json:"extraArgs,omitempty"`
+	ParachainId      *int          `json:"parachainId,omitempty"`
+	Cluster          *string       `json:"cluster,omitempty"`
 }
 
 type Recommend struct {
