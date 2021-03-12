@@ -159,8 +159,7 @@ func CreateValidator(cfgValidator CfgValidator) []*CreateNodeResult {
 		conf.NodeName = fmt.Sprintf("%s-%d", conf.NodeName, i)
 		createdNode, err := service.CreateNode(wsID, &conf)
 		if err != nil {
-			nodeChan <- &CreateNodeResult{Error: err}
-			break
+			return []*CreateNodeResult{{Error: err}}
 		}
 		fmt.Println(fmt.Sprintf("Node %s (%d) created", conf.NodeName, createdNode.ID))
 		if i == 0 {
@@ -234,9 +233,6 @@ func CreateValidator(cfgValidator CfgValidator) []*CreateNodeResult {
 		select {
 		case ret := <-nodeChan:
 			nodeRet = append(nodeRet, ret)
-			if ret.Error != nil {
-				return nodeRet
-			}
 		}
 	}
 
