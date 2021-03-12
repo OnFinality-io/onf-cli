@@ -104,7 +104,7 @@ func bootstrapCmd() *cobra.Command {
 			var bootNodeAddrs []interface{}
 			for _, bootNode := range bootNodeRet {
 				bootNodeAddrs = append(bootNodeAddrs, service.BootNode{
-					Address: utils.String(bootNode.Node.Endpoints.P2p),
+					NodeID: utils.String(strconv.FormatUint(bootNode.Node.ID, 10)),
 				})
 			}
 
@@ -117,7 +117,7 @@ func bootstrapCmd() *cobra.Command {
 			}
 			fmt.Println("Updated network spec with new bootnode list:")
 			for _, a := range bootNodeAddrs {
-				fmt.Println("\t", *a.(service.BootNode).Address)
+				fmt.Println("\t", *a.(service.BootNode).NodeID)
 			}
 			fmt.Println("New network launched")
 		},
@@ -201,20 +201,22 @@ func CreateValidator(cfgValidator CfgValidator) []*CreateNodeResult {
 						return
 					}
 
-					// update session key for each node
-					for _, key := range cfgValidator.SessionsKey[idx] {
-						err = service.InsertSessionKey(nodeDetail.Endpoints.RPC, &key)
-						if err != nil {
-							fmt.Println("key err", err)
+					if cfgValidator.SessionsKey != nil && cfgValidator.SessionsKey[idx] != nil {
+						// update session key for each node
+						for _, key := range cfgValidator.SessionsKey[idx] {
+							err = service.InsertSessionKey(nodeDetail.Endpoints.RPC, &key)
+							if err != nil {
+								fmt.Println("key err", err)
+							}
 						}
-					}
-					fmt.Println(fmt.Sprintf("Node %s (%d)'s session keys are updated", conf.NodeName, nodeDetail.ID))
+						fmt.Println(fmt.Sprintf("Node %s (%d)'s session keys are updated", conf.NodeName, nodeDetail.ID))
 
-					err = service.RestartNode(createdNode.WorkspaceID, createdNode.ID)
-					if err != nil {
-						nodeChan <- &CreateNodeResult{Error: fmt.Errorf("failed to restart %s, err: %s", conf.NodeName, err)}
-						done <- true
-						return
+						err = service.RestartNode(createdNode.WorkspaceID, createdNode.ID)
+						if err != nil {
+							nodeChan <- &CreateNodeResult{Error: fmt.Errorf("failed to restart %s, err: %s", conf.NodeName, err)}
+							done <- true
+							return
+						}
 					}
 
 					fmt.Println(fmt.Sprintf("Node %s (%d) is restarted", conf.NodeName, nodeDetail.ID))
