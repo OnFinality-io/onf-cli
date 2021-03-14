@@ -29,30 +29,30 @@ jobs:
 
     - name: Set up Go 1.x
       uses: actions/setup-go@v2
-#      if: steps.version.outputs.changed == 'true'
+      if: steps.version.outputs.changed == 'true'
       with:
         go-version: ${{ matrix.go-version }}
 
     - name: read version
       uses: pCYSl5EDgo/cat@master
       id: onf-version
-#      if: steps.version.outputs.changed == 'true'
+      if: steps.version.outputs.changed == 'true'
       with:
         path: VERSION
 
     - name: build linux
-#      if: steps.version.outputs.changed == 'true'
+      if: steps.version.outputs.changed == 'true'
       run: sh ./scripts/build/linux.sh
     - name: build macos
-#      if: steps.version.outputs.changed == 'true'
+      if: steps.version.outputs.changed == 'true'
       run: sh ./scripts/build/osx.sh
     - name: build window
-#      if: steps.version.outputs.changed == 'true'
+      if: steps.version.outputs.changed == 'true'
       run: sh ./scripts/build/windows.sh
     
     - name: upload
       uses: "marvinpinto/action-automatic-releases@latest"
-#      if: steps.version.outputs.changed == 'true'
+      if: steps.version.outputs.changed == 'true'
       with:
         repo_token: "${{ secrets.GITHUB_TOKEN }}"
         automatic_release_tag: v${{ steps.onf-version.outputs.text }}
