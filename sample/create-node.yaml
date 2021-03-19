@@ -1,7 +1,13 @@
 nodeName: cli-test
-clusterKey: sy
-nodeSpecKey: medium
-networkSpecKey: kusama
-initFromBackup: true
+nodeType: full # full or validator
+clusterKey: jm # available values: `onf info cluster`
+nodeSpecKey: medium # small, medium, large
+networkSpecKey: kusama # available values: `onf network-spec list`
+initFromBackup: true # works only with polkadot and kusama for now
 publicPort: true
 useApiKey: true
+storage: 40Gi
+imageVersion: v0.8.29
+metadata:
+  extraArgs: []
+  # - --bootnodes=/dns4/node-6747330110807130112-0.p2p.onfinality.io/tcp/17911/p2p/12D3KooWHw6o6xaky49NjpsJkPcuHZUb2KfprFRmRNfBkeur3Qo1
