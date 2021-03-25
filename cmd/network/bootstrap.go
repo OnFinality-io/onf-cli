@@ -2,6 +2,7 @@ package network
 
 import (
 	"fmt"
+	"github.com/OnFinality-io/onf-cli/cmd/image"
 	"strconv"
 
 	"github.com/OnFinality-io/onf-cli/pkg/utils"
@@ -137,11 +138,18 @@ func ReadConfig(filePath string) (*CfgBootstrap, error) {
 }
 
 func CreateNetworkSpec(payload *service.CreateNetworkSpecPayload) (*service.NetworkSpec, error) {
-	specs, err := service.CreateNetworkSpecs(wsID, payload)
+	var specs *service.NetworkSpec
+	var err error
+	image.ImageCheckProcess(payload.ImageRepository, *payload.Metadata.ImageVersion, true, func() {
+		specs, err = service.CreateNetworkSpecs(wsID, payload)
+	})
+	if specs == nil {
+		return nil, fmt.Errorf("Image check err.")
+	}
 	if err != nil {
 		return nil, err
 	}
-	return specs, nil
+	return specs, err
 }
 
 type CreateNodeResult struct {
