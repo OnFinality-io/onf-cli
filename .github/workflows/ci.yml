@@ -25,7 +25,7 @@ jobs:
       uses: marceloprado/has-changed-path@v1
       id: version
       with:
-        paths: VERSION
+        paths: ./VERSION
 
     - name: Set up Go 1.x
       uses: actions/setup-go@v2
