@@ -20,6 +20,8 @@ jobs:
     steps:
     - name: Check out code into the Go module directory
       uses: actions/checkout@v2
+      with:
+        fetch-depth: 100
 
     - name: version check
       uses: marceloprado/has-changed-path@v1
