@@ -3,9 +3,9 @@ networkSpec:
     name: local-rococo
     displayName: Local Rococo
     protocol: substrate
-    imageRepository: parity/rococo
+    imageRepository: parity/polkadot
     metadata:
-      imageVersion: rococo-v1-0.8.29-becf4cf3-15e32a1a
+      imageVersion: v0.9.6
   chainSpec: "./rococo-local.json"
 validator:
   count: 2

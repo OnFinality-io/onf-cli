@@ -52,6 +52,7 @@ type Protocols struct {
 type NodeRecommendation struct {
 	Network      string `json:"network" header:"network"`
 	NodeSpec     string `json:"nodeSpec" header:"nodeSpec"`
+	NodeSpecMultiplier int      `json:"nodeSpecMultiplier" header:"NodeSpecMultiplier"`
 	StorageSize  int    `json:"storageSize" header:"storageSize"`
 	ImageVersion string `json:"imageVersion" header:"imageVersion"`
 	Client       string `json:"client" header:"client"`
