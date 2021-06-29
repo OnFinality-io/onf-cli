@@ -5,6 +5,7 @@ import (
 )
 
 var wsID uint64
+var networkID string
 
 func NewCmd() *cobra.Command {
 	cmd := &cobra.Command{
@@ -21,6 +22,7 @@ func NewCmd() *cobra.Command {
 		GenerateCmd(),
 		BootstrapCmd(),
 		UploadCmd(),
+		UpdateCmd(),
 	)
 	return cmd
 }

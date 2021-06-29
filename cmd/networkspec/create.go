@@ -8,9 +8,9 @@ import (
 	"github.com/OnFinality-io/onf-cli/pkg/service"
 	"github.com/spf13/cobra"
 )
+var filePath string
 
 func CreateCmd() *cobra.Command {
-	var filePath string
 	printFlags := printer.NewPrintFlags()
 	c := &cobra.Command{
 		Use:   "create (-f FILENAME)",

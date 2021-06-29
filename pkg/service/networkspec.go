@@ -18,6 +18,7 @@ type BootNode struct {
 }
 
 type NetworkSpecMetadata struct {
+	Recommend 		 *Recommend    `json:"recommend,omitempty"`
 	ChainSpec        *string       `json:"chainspec,omitempty"`
 	ImageVersion     *string       `json:"imageVersion,omitempty"`
 	Command          *string       `json:"command,omitempty"`

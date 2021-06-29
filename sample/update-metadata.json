@@ -1,0 +1,17 @@
+{
+  "bootnodes": [
+    {
+      "nodeId": ""
+    }, {
+      "address": ""
+    }
+  ],
+    "recommend": {
+      "imageVersion": "v0.9.6",
+      "nodeSpec": "medium",
+      "storageSize": 15
+
+    }
+
+}
+
