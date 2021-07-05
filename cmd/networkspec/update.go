@@ -19,7 +19,7 @@ func UpdateCmd() *cobra.Command {
 				fmt.Println(err.Error())
 				return
 			}
-			payload := &service.NetworkSpecMetadata{}
+			payload := &service.UpdateNetworkSpecPayload{}
 			if filePath != "" {
 				err = helpers.ApplyDefinitionFile(filePath, payload)
 				if err != nil {
@@ -27,7 +27,12 @@ func UpdateCmd() *cobra.Command {
 					return
 				}
 			}
-			err = service.UpdateNetworkSpecMetadata(wsID, networkID,payload)
+			if payload.Metadata == nil {
+				err = fmt.Errorf("metadata is required but not found")
+				fmt.Println(err)
+				return
+			}
+			err = service.UpdateNetworkSpecMetadata(wsID, networkID, payload.Metadata)
 			if err != nil {
 				fmt.Println(err.Error())
 				return

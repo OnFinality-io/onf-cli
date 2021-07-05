@@ -18,7 +18,7 @@ type BootNode struct {
 }
 
 type NetworkSpecMetadata struct {
-	Recommend 		 *Recommend    `json:"recommend,omitempty"`
+	Recommend        *Recommend    `json:"recommend,omitempty"`
 	ChainSpec        *string       `json:"chainspec,omitempty"`
 	ImageVersion     *string       `json:"imageVersion,omitempty"`
 	Command          *string       `json:"command,omitempty"`
@@ -65,6 +65,10 @@ type CreateNetworkSpecPayload struct {
 	Protocol        string              `json:"protocol"`
 	ImageRepository string              `json:"imageRepository"`
 	Metadata        NetworkSpecMetadata `json:"metadata"`
+}
+
+type UpdateNetworkSpecPayload struct {
+	Metadata *NetworkSpecMetadata `json:"metadata"`
 }
 
 type GenerateChainSpecPayload struct {
