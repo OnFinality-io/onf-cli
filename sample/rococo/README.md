@@ -1,10 +1,33 @@
-# Samples - bootstrap a rococo network
+# Samples - bootstrap a dedicated rococo for your team
 
-rococo-local.json and rococo-3.json are copied from https://github.com/substrate-developer-hub/cumulus-workshop
+## onf-cli version
+`>= 0.3.3`
 
-## Validator Numbers
-bootstrap-rococo.yaml describes a two-validator network
-to switch to 3-validator network, change networkSpec.chainSpec and validator.count correspondingly
+## Image
+We use latest polkadot image parity/polkadot:v0.9.7
+Should be fine to replace it with new version
 
-## how to
-run `onf network bootstrap -f bootstrap-rococo.yaml`
+## Chainspec
+We use the built-in rococo-local which defines a two-validator network (alice and bob)
+
+## Steps - 1 Create the network in your workspace
+run `onf network-spec create -f create-network.yaml` and note down network-spec's key
+
+## Steps - 2 Launch Alice
+update `node-alice.yaml` with your network-spec's key and
+
+run `onf node create -f node-alice.yaml` and note down Alice's nodeId
+
+## Steps - 3 Update network-spec to make Alice bootnode
+update `update-network.yaml` with alice's nodeId
+
+run `onf network-spec update -f update-network.yaml -n <your network-spec's key>`
+
+## Step - 4 Launch Bob
+update `node-bob.yaml` with your network-spec's key and
+
+run `onf node create -f node-bob.yaml`
+
+## Follow-ups
+The network should start producing blocks, you can connect polkadot apps to your node and see.
+Also you can start full node in onfinality ui as well as cli, and new nodes will connect to alice and sync by default.

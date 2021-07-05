@@ -1,0 +1,13 @@
+nodeName: bob
+nodeType: validator # full or validator
+clusterKey: lh # available values: `onf info cluster`
+nodeSpecKey: medium # small, medium, large
+networkSpecKey: <your network-spec's key> # available values: `onf network-spec list`
+initFromBackup: false # works only with polkadot and kusama for now
+publicPort: true
+useApiKey: true
+storage: 40Gi
+imageVersion: v0.9.7
+metadata:
+  extraArgs:
+  - --bob
