@@ -1,0 +1,44 @@
+networkSpec:
+  config:
+    name: two-validator-network
+    displayName: two-validator-network
+    protocol: substrate
+    imageRepository: parity/substrate
+    metadata:
+      imageVersion: v3.0.0
+  chainSpec: "./chainspec.json"
+validator:
+  count: 2
+  node:
+    nodeName: boostrap-validator
+    nodeType: validator
+    clusterKey: lh
+    nodeSpecKey: small
+    initFromBackup: false
+    publicPort: true
+    useApiKey: true
+    storage: 10Gi
+  sessionsKey:
+    - - scheme: babe
+        publicKey: '0xd43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d'
+        phrase: "//Alice"
+      - scheme: gran
+        publicKey: '0x88dc3417d5058ec4b4503e0c12ea1a0a89be200fe98922423d4334014fa6b0ee'
+        phrase: "//Alice"
+    - - scheme: babe
+        publicKey: '0x8eaf04151687736326c9fea17e25fc5287613693c912909cb226aa4794f26a48'
+        phrase: "//Bob"
+      - scheme: gran
+        publicKey: '0xd17c2d7823ebf260fd138f2d7e27d114c0145d968b5ff5006125f2414fadae69'
+        phrase: "//Bob"
+bootNode:
+  count: 0 # change it to > 0 to have dedicated bootnodes
+  node:
+    nodeName: boostrap-bootnode
+    nodeType: full
+    clusterKey: lh
+    nodeSpecKey: small
+    initFromBackup: false
+    publicPort: true
+    useApiKey: true
+    storage: 10Gi

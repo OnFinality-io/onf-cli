@@ -160,7 +160,6 @@ type CreateNodeResult struct {
 // loop to create validators from config
 func CreateValidator(cfgValidator CfgValidator) []*CreateNodeResult {
 	validatorCount := cfgValidator.Count
-
 	nodeChan := make(chan *CreateNodeResult, validatorCount)
 	for i := 0; i < validatorCount; i++ {
 		conf := cfgValidator.Node
@@ -182,6 +181,30 @@ func CreateValidator(cfgValidator CfgValidator) []*CreateNodeResult {
 				nodeChan <- &CreateNodeResult{Error: err}
 				break
 			}
+			w := watcher.Watcher{Second: 10}
+			w.Run(func(done chan bool) {
+				status, _ := service.GetNodeStatus(wsID, createdNode.ID)
+				switch status.Status {
+				case node.Error:
+					nodeChan <- &CreateNodeResult{Error: fmt.Errorf("create %s err", conf.NodeName)}
+					done <- true
+					return
+				case node.Running:
+					fmt.Println(fmt.Sprintf("Node %s (%d) is %s", conf.NodeName, createdNode.ID, status.Status))
+					nodeDetail, err := service.GetNodeDetail(wsID, createdNode.ID)
+					if err != nil {
+						nodeChan <- &CreateNodeResult{Error: fmt.Errorf("Get %s of detail %s", conf.NodeName, err)}
+						done <- true
+						return
+					}
+					if nodeDetail.Endpoints.P2p != "" || nodeDetail.Endpoints.P2pInternal != "" {
+						fmt.Println(fmt.Sprintf("Node %s (%d): p2p endpoint is %s", conf.NodeName, createdNode.ID, nodeDetail.Endpoints.P2p))
+						done <- true
+					}
+				default:
+					fmt.Println(fmt.Sprintf("Waiting for %s (%d) running", conf.NodeName, createdNode.ID))
+				}
+			})
 		}
 		go func(idx int, nodeId uint64) {
 			// monitor validator node running status
