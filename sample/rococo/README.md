@@ -1,4 +1,4 @@
-# Samples - boostrap a dedicated rococo for your team
+# Samples - bootstrap a dedicated rococo for your team
 
 ## onf-cli version
 `>= 0.3.3`
