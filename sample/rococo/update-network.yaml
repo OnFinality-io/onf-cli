@@ -1,0 +1,6 @@
+metadata:
+  bootnodes: [
+    {
+      nodeId: # id of alice
+    }
+  ]
