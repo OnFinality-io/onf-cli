@@ -8,6 +8,7 @@ import (
 	"github.com/OnFinality-io/onf-cli/pkg/service"
 	"github.com/spf13/cobra"
 )
+
 var filePath string
 
 func CreateCmd() *cobra.Command {
@@ -27,7 +28,7 @@ func CreateCmd() *cobra.Command {
 				fmt.Println(err.Error())
 				return
 			}
-			image.ImageCheckProcess(payload.ImageRepository, *payload.Metadata.ImageVersion, true, func() {
+			image.ImageCheckProcess(payload.ImageRepository, *payload.ImageVersion, true, func() {
 				specs, err := service.CreateNetworkSpecs(wsID, payload)
 				if err != nil {
 					fmt.Println(err.Error())

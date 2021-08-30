@@ -23,3 +23,11 @@ cd onf-cli
 make binary-osx
 ```
 
+## Env configuration
+
+|  Key | Description  |
+| ------------ | ------------ |
+|  ONF_ACCESS_KEY | How to obtain: https://app.onfinality.io/account  |
+|  ONF_SECRET_KEY | How to obtain: https://app.onfinality.io/account  |
+| ONF_WORKSPACE_ID | Specify a workspace ID|
+

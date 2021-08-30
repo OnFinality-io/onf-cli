@@ -5,7 +5,7 @@ import (
 	"fmt"
 
 	"github.com/OnFinality-io/onf-cli/pkg/api"
-	"github.com/parnurzeal/gorequest"
+	"github.com/OnFinality-io/onf-cli/pkg/utils/gorequest"
 )
 
 var instance *api.Api

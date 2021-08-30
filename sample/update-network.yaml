@@ -1,0 +1,16 @@
+name: cumulus-testnet
+config:
+  nodeTypes:
+    full:
+      args:
+        - key: --bootnodes
+          value: "/dns4/node-6845929297477042176-0.p2p.onfinality.me/tcp/18876/p2p/12D3KooWFJtAwyAvn24aL1D3tSXp3DGdRFkuh37oAT55GAhSMxoW"
+      env:
+        - key: TEST
+          value: "TEST"
+    validator:
+      args:
+        - key: --bootnodes
+          value: "/dns4/node-6845929297477042176-0.p2p.onfinality.me/tcp/18876/p2p/12D3KooWFJtAwyAvn24aL1D3tSXp3DGdRFkuh37oAT55GAhSMxoW"
+
+

@@ -2,7 +2,7 @@ package api
 
 import (
 	"fmt"
-	"github.com/parnurzeal/gorequest"
+	"github.com/OnFinality-io/onf-cli/pkg/utils/gorequest"
 	"github.com/spf13/viper"
 	"net/http"
 	"net/url"
@@ -22,6 +22,7 @@ const (
 type Api struct {
 	req       *gorequest.SuperAgent
 	baseURL   string
+	version   int
 	AccessKey string
 	secretKey string
 }
@@ -31,12 +32,30 @@ func New(accessKey, secretKey string, baseURL string) *Api {
 	req.Header.Set("content-type", "application/json")
 	req.Header.Set("x-onf-client", viper.GetString("app.name"))
 	req.Header.Set("x-onf-version", viper.GetString("app.version"))
+	//req.Debug = true
 	return &Api{
 		baseURL:   baseURL,
 		req:       req,
 		AccessKey: accessKey,
 		secretKey: secretKey,
+		version:   1,
 	}
+}
+
+func (a *Api) Clone() *Api {
+	return &Api{
+		baseURL:   a.baseURL,
+		req:       a.req,
+		AccessKey: a.AccessKey,
+		secretKey: a.secretKey,
+		version:   a.version,
+	}
+}
+
+func (a *Api) Ver2() *Api {
+	cloneApi := a.Clone()
+	cloneApi.version = 2
+	return cloneApi
 }
 
 type RequestOptions struct {
@@ -47,8 +66,8 @@ type RequestOptions struct {
 
 func (a *Api) Request(method Method, path string, opts *RequestOptions) *gorequest.SuperAgent {
 	r := a.req.Clone()
-
-	u, _ := url.Parse(fmt.Sprintf("%s%s", a.baseURL, path))
+	fullApi := fmt.Sprintf("%s/v%d", a.baseURL, a.version)
+	u, _ := url.Parse(fmt.Sprintf("%s%s", fullApi, path))
 	m := string(method)
 	r = r.CustomMethod(m, u.String())
 
@@ -77,7 +96,7 @@ func (a *Api) Upload(path string, opts *RequestOptions) *gorequest.SuperAgent {
 	r.Header.Del("content-type")
 	r.Type("multipart")
 	for n, f := range opts.Files {
-		r.SendFile(f, n, "files")
+		r.SendFile(f, n, "file", true)
 	}
 	return r
 }

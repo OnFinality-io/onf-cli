@@ -1,0 +1,16 @@
+nodeName: Rococo alice
+nodeType: validator # full or validator
+clusterKey: sy # available values: `onf info cluster`
+nodeSpec:
+  key: unit
+  multiplier: 1
+networkSpecKey: e83317a5-7d8c-4581-be51-87a2d7dceb63    # available values: `onf network-spec list`
+initFromBackup: false # works only with polkadot and kusama for now
+publicPort: true
+useApiKey: true
+storage: 40Gi
+imageVersion: v0.9.9
+config:
+  extraArgs:
+    - key: "--alice"
+

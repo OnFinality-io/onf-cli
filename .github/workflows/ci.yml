@@ -2,7 +2,7 @@ name: build & upload
 
 on:
   push:
-    branches: [ master ]
+    branches: [ feature/networkV2 ]
   pull_request:
     branches: [ master ]
 
@@ -43,13 +43,10 @@ jobs:
         path: VERSION
 
     - name: build linux
-      if: steps.version.outputs.changed == 'true'
       run: sh ./scripts/build/linux.sh
     - name: build macos
-      if: steps.version.outputs.changed == 'true'
       run: sh ./scripts/build/osx.sh
     - name: build window
-      if: steps.version.outputs.changed == 'true'
       run: sh ./scripts/build/windows.sh
     
     - name: upload
@@ -58,6 +55,6 @@ jobs:
       with:
         repo_token: "${{ secrets.GITHUB_TOKEN }}"
         automatic_release_tag: v${{ steps.onf-version.outputs.text }}
-        prerelease: false
+        prerelease: true
         files: |
           ./build/*

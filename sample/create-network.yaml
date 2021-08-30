@@ -2,9 +2,17 @@ name: mandala
 displayName: mandala created by cli
 protocol: substrate
 imageRepository: acala/acala-node
-metadata:
-  chainspec: mandala
-  imageVersion: 0.7.11 # the default image version to launch nodes
-  command:  # if docker image doesn't have entrypoint then requires explicitly define here
-  cluster:  # if want to restrict nodes in a particular cluster
-  extraArgs: [] # extra arguments apply to all nodes of this network
+imageVersion: 0.7.11
+config:
+  nodeTypes:
+    full:
+      args:
+        - key: --chain
+          value: "mandala"
+      env:
+        - key: TEST
+          value: "TEST"
+    validator:
+      args:
+        - key: --chain
+          value: "mandala"

@@ -24,6 +24,7 @@ func NewCmd() *cobra.Command {
 		restartCmd(),
 		terminateCmd(),
 		expandStorageCmd(),
+		updateImageCmd(),
 	)
 	return cmd
 }

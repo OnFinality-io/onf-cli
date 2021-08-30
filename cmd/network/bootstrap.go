@@ -2,16 +2,22 @@ package network
 
 import (
 	"fmt"
-	"github.com/OnFinality-io/onf-cli/cmd/image"
-	"strconv"
-
+	"github.com/OnFinality-io/onf-cli/cmd/networkspec/payload"
+	"github.com/OnFinality-io/onf-cli/pkg/models"
 	"github.com/OnFinality-io/onf-cli/pkg/utils"
-	"github.com/OnFinality-io/onf-cli/pkg/watcher"
 
 	"github.com/OnFinality-io/onf-cli/cmd/helpers"
+	"github.com/OnFinality-io/onf-cli/cmd/image"
 	"github.com/OnFinality-io/onf-cli/cmd/node"
 	"github.com/OnFinality-io/onf-cli/pkg/service"
+	"github.com/OnFinality-io/onf-cli/pkg/watcher"
 	"github.com/spf13/cobra"
+)
+
+const (
+	bootnodes            = "--bootnodes"
+	ProtocolParachainKey = "polkadot-parachain"
+	Substrate            = "substrate"
 )
 
 func bootstrapCmd() *cobra.Command {
@@ -28,10 +34,6 @@ func bootstrapCmd() *cobra.Command {
 			}
 			fmt.Println("Read config success")
 
-			//TODO check
-			// Is  the sessionKey and validator count equal?
-			// check if chanspec file exist
-
 			// setup workspace id
 			wsID, err = helpers.GetWorkspaceID(cmd)
 			if err != nil {
@@ -40,26 +42,12 @@ func bootstrapCmd() *cobra.Command {
 			}
 
 			// create network spec if exist in config
-			spec, err := CreateNetworkSpec(&cfg.NetworkSpec.Config)
+			spec, err := CreateNetworkSpec(cfg.NetworkSpec)
 			if err != nil {
 				fmt.Println(err.Error())
 				return
 			}
 			fmt.Println(fmt.Sprintf("Network spec %s created", spec.Key))
-
-			// 	upload chainspec
-			chainspecFile := cfg.NetworkSpec.ChainSpec
-			ret, err := service.UploadChainSpec(wsID, spec.Key, []string{chainspecFile})
-			if err != nil {
-				fmt.Println(err.Error())
-				return
-			}
-			if !ret.Success {
-				// Continue the follow-up process
-				fmt.Println("failed to upload chain spec")
-				return
-			}
-			fmt.Println("Chainspec uploaded")
 
 			// Initial operation for validator and boot node
 			cfg.Validator.Node.NetworkSpecKey = spec.Key
@@ -69,7 +57,7 @@ func bootstrapCmd() *cobra.Command {
 			cfg.BootNode.Node.ImageVersion = spec.Metadata.ImageVersion
 
 			// create networkspec if exist in config
-			validatorRet := CreateValidator(cfg.Validator)
+			validatorRet := CreateValidator(cfg.Validator, spec)
 			isInterrupted := false
 			for _, v := range validatorRet {
 				if v.Error != nil {
@@ -82,13 +70,14 @@ func bootstrapCmd() *cobra.Command {
 			}
 			fmt.Println("Create validators success")
 
-			// boot node startup parameter settings
-			var extraArgs []string
+			var validatorExArgs []string
 			for _, validator := range validatorRet {
-				extraArgs = append(extraArgs, fmt.Sprintf("--bootnodes=%s", validator.Node.Endpoints.P2p))
+				if validator.Node.Endpoints.P2p != "" {
+					validatorExArgs = append(validatorExArgs, fmt.Sprintf("%s=%s", bootnodes, validator.Node.Endpoints.P2p))
+				}
 			}
 
-			bootNodeRet := CreateBootNode(extraArgs, cfg.BootNode)
+			bootNodeRet := CreateBootNode(validatorExArgs, cfg.BootNode, spec)
 			isInterrupted = false
 			for _, v := range bootNodeRet {
 				if v.Error != nil {
@@ -102,15 +91,22 @@ func bootstrapCmd() *cobra.Command {
 			fmt.Println("Create boot nodes success")
 
 			// update network spec with new bootnode p2p address
-			var bootNodeAddrs []interface{}
+			var bootNodeAddrs []string
 			for _, bootNode := range bootNodeRet {
-				bootNodeAddrs = append(bootNodeAddrs, service.BootNode{
-					NodeID: utils.String(strconv.FormatUint(bootNode.Node.ID, 10)),
-				})
+				bootNodeAddrs = append(bootNodeAddrs, bootNode.Node.Endpoints.P2p)
 			}
 
-			err = service.UpdateNetworkSpecMetadata(wsID, spec.Key, &service.NetworkSpecMetadata{
-				BootNodes: bootNodeAddrs,
+			var argPayloads []*payload.ArgPayload
+			for _, addr := range bootNodeAddrs {
+				argPayloads = append(argPayloads, &payload.ArgPayload{Key: utils.String(bootnodes), Value: utils.String(addr)})
+			}
+
+			err = service.UpdateNetworkSpec(wsID, spec.Key, &service.UpdateNetworkSpecPayload{
+				Config: &payload.ConfigPayload{
+					NodeTypes: map[models.NodeType]*payload.ConfigRule{
+						cfg.BootNode.Node.NodeType: &payload.ConfigRule{Args: argPayloads},
+					},
+				},
 			})
 			if err != nil {
 				fmt.Println(err.Error())
@@ -118,7 +114,7 @@ func bootstrapCmd() *cobra.Command {
 			}
 			fmt.Println("Updated network spec with new bootnode list:")
 			for _, a := range bootNodeAddrs {
-				fmt.Println("\t", *a.(service.BootNode).NodeID)
+				fmt.Println("\t", a)
 			}
 			fmt.Println("New network launched")
 		},
@@ -138,9 +134,12 @@ func ReadConfig(filePath string) (*CfgBootstrap, error) {
 }
 
 func CreateNetworkSpec(payload *service.CreateNetworkSpecPayload) (*service.NetworkSpec, error) {
+	if payload.ImageVersion == nil {
+		return nil, fmt.Errorf("ImageVersion is required.")
+	}
 	var specs *service.NetworkSpec
 	var err error
-	image.ImageCheckProcess(payload.ImageRepository, *payload.Metadata.ImageVersion, true, func() {
+	image.ImageCheckProcess(payload.ImageRepository, *payload.ImageVersion, true, func() {
 		specs, err = service.CreateNetworkSpecs(wsID, payload)
 	})
 	if specs == nil {
@@ -158,7 +157,7 @@ type CreateNodeResult struct {
 }
 
 // loop to create validators from config
-func CreateValidator(cfgValidator CfgValidator) []*CreateNodeResult {
+func CreateValidator(cfgValidator CfgValidator, spec *service.NetworkSpec) []*CreateNodeResult {
 	validatorCount := cfgValidator.Count
 	nodeChan := make(chan *CreateNodeResult, validatorCount)
 	for i := 0; i < validatorCount; i++ {
@@ -170,12 +169,6 @@ func CreateValidator(cfgValidator CfgValidator) []*CreateNodeResult {
 		}
 		fmt.Println(fmt.Sprintf("Node %s (%d) created", conf.NodeName, createdNode.ID))
 		if i == 0 {
-			// update networkspec
-			err = service.UpdateNetworkSpecMetadata(wsID, conf.NetworkSpecKey, &service.NetworkSpecMetadata{
-				BootNodes: []interface{}{service.BootNode{
-					NodeID: utils.String(strconv.FormatUint(createdNode.ID, 10)),
-				}},
-			})
 			fmt.Println(fmt.Sprintf("Node %s (%d) is set as bootnode", conf.NodeName, createdNode.ID))
 			if err != nil {
 				nodeChan <- &CreateNodeResult{Error: err}
@@ -191,12 +184,40 @@ func CreateValidator(cfgValidator CfgValidator) []*CreateNodeResult {
 					return
 				case node.Running:
 					fmt.Println(fmt.Sprintf("Node %s (%d) is %s", conf.NodeName, createdNode.ID, status.Status))
-					nodeDetail, err := service.GetNodeDetail(wsID, createdNode.ID)
+
+					var nodeDetail *service.Node
+					watcher := watcher.Watcher{Second: 5}
+					watcher.Run(func(done chan bool) {
+						nodeDetail, err = service.GetNodeDetail(wsID, createdNode.ID)
+						if err != nil {
+							done <- true
+							//fmt.Printf("Get p2p address err. %v",err)
+							return
+						}
+						if nodeDetail.Endpoints.P2p != "" {
+							//fmt.Printf("nodeName:%s,p2p address:%s\n",conf.NodeName,nodeDetail.Endpoints.P2p)
+							done <- true
+							return
+						}
+					})
+					argPayloads := []*payload.ArgPayload{{Key: utils.String(bootnodes), Value: utils.String(nodeDetail.Endpoints.P2p)}}
+
+					// update networkspec
+					err = service.UpdateNetworkSpec(wsID, conf.NetworkSpecKey,
+						&service.UpdateNetworkSpecPayload{
+							Config: &payload.ConfigPayload{
+								NodeTypes: map[models.NodeType]*payload.ConfigRule{
+									cfgValidator.Node.NodeType: {Args: argPayloads},
+								},
+							},
+						},
+					)
 					if err != nil {
-						nodeChan <- &CreateNodeResult{Error: fmt.Errorf("Get %s of detail %s", conf.NodeName, err)}
+						nodeChan <- &CreateNodeResult{Error: fmt.Errorf("Update network spec %s, err:%s", conf.NetworkSpecKey, err)}
 						done <- true
 						return
 					}
+
 					if nodeDetail.Endpoints.P2p != "" || nodeDetail.Endpoints.P2pInternal != "" {
 						fmt.Println(fmt.Sprintf("Node %s (%d): p2p endpoint is %s", conf.NodeName, createdNode.ID, nodeDetail.Endpoints.P2p))
 						done <- true
@@ -237,6 +258,8 @@ func CreateValidator(cfgValidator CfgValidator) []*CreateNodeResult {
 							err = service.InsertSessionKey(nodeDetail.Endpoints.RPC, &key)
 							if err != nil {
 								fmt.Println("key err", err)
+								done <- true
+								return
 							}
 						}
 						fmt.Println(fmt.Sprintf("Node %s (%d)'s session keys are updated", conf.NodeName, nodeDetail.ID))
@@ -270,7 +293,7 @@ func CreateValidator(cfgValidator CfgValidator) []*CreateNodeResult {
 	return nodeRet
 }
 
-func CreateBootNode(extraArgs []string, bootNode CfgBootNode) []*CreateNodeResult {
+func CreateBootNode(exArgs []string, bootNode CfgBootNode, spec *service.NetworkSpec) []*CreateNodeResult {
 	// loop to create bootnode with validator p2p address
 	bootNodeCount := bootNode.Count
 	nodeChan := make(chan *CreateNodeResult, bootNodeCount)
@@ -278,19 +301,45 @@ func CreateBootNode(extraArgs []string, bootNode CfgBootNode) []*CreateNodeResul
 		go func(idx int) {
 			conf := bootNode.Node
 			conf.NodeName = fmt.Sprintf("%s-%d", conf.NodeName, idx)
-			if conf.Metadata != nil {
-				conf.Metadata.ExtraArgs = append(conf.Metadata.ExtraArgs, extraArgs...)
-			} else {
-				conf.Metadata = &service.NodeMetadata{
-					ExtraArgs: extraArgs,
+
+			extraArgs := make(service.ExtraArgs)
+			if conf.Config == nil {
+				if spec.ProtocolKey == Substrate {
+					extraArgs["default"] = &exArgs
+				} else if spec.ProtocolKey == ProtocolParachainKey {
+					extraArgs["parachain"] = &exArgs
 				}
+				conf.Config = &service.NodeLaunchConfig{ExtraArgs: &extraArgs}
+			} else {
+				if spec.ProtocolKey == Substrate {
+					argsPayload := extraArgs["default"]
+					*argsPayload = append(*argsPayload, exArgs...)
+				} else if spec.ProtocolKey == ProtocolParachainKey {
+					argsPayload := extraArgs["parachain"]
+					*argsPayload = append(*argsPayload, exArgs...)
+				}
+
 			}
+
 			node, err := service.CreateNode(wsID, &conf)
 			if err != nil {
 				nodeChan <- &CreateNodeResult{Error: fmt.Errorf("create %s err %s", conf.NodeName, err)}
 				return
 			}
-			node, err = service.GetNodeDetail(wsID, node.ID)
+
+			watcher := watcher.Watcher{Second: 3}
+			watcher.Run(func(done chan bool) {
+				node, err = service.GetNodeDetail(wsID, node.ID)
+				if err != nil {
+					nodeChan <- &CreateNodeResult{Error: fmt.Errorf("Get %s of detail %s", conf.NodeName, err)}
+					done <- true
+					return
+				}
+				if node.Endpoints.P2p != "" {
+					done <- true
+					return
+				}
+			})
 			if err != nil {
 				nodeChan <- &CreateNodeResult{Error: fmt.Errorf("Get %s of detail %s", conf.NodeName, err)}
 				return
@@ -300,7 +349,7 @@ func CreateBootNode(extraArgs []string, bootNode CfgBootNode) []*CreateNodeResul
 			nodeChan <- &CreateNodeResult{Node: node}
 		}(i)
 	}
-	nodeRet := []*CreateNodeResult{}
+	var nodeRet []*CreateNodeResult
 	for i := 0; i < bootNodeCount; i++ {
 		select {
 		case ret := <-nodeChan:

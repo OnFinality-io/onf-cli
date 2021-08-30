@@ -1,5 +1,9 @@
 package service
 
+import (
+	"github.com/OnFinality-io/onf-cli/pkg/models"
+)
+
 type Endpoints struct {
 	RPC         string `json:"rpc"`
 	WS          string `json:"ws"`
@@ -7,12 +11,13 @@ type Endpoints struct {
 	P2p         string `json:"p2p"`
 }
 
-type NodeListItem struct {
+type NodeItem struct {
 	ID             uint64 `json:"id,string" header:"ID"`
 	Name           string `json:"name" header:"Name"`
 	NetworkSpecKey string `json:"networkSpecKey" header:"Network"`
 	ClusterHash    string `json:"clusterHash" header:"Cluster"`
 	Status         string `json:"status" header:"Status"`
+	Image          string `json:"image" header:"image"`
 }
 
 type Node struct {
@@ -47,29 +52,61 @@ type NodeMetadata struct {
 	Labels     map[string]string `json:"labels,omitempty"`
 }
 
+type ExtraArgs map[string]*[]string
+
+type NodeLaunchConfig struct {
+	Vars      []*Vars      `json:"vars"`
+	ExtraArgs *ExtraArgs   `json:"extraArgs"`
+	ExtraEnvs []*ExtraEnvs `json:"extraEnvs"`
+}
+type Value struct {
+	ValueType models.VarValueType `json:"valueType"`
+	Payload   interface{}         `json:"payload"`
+}
+type Vars struct {
+	Key   *string `json:"key"`
+	Value *Value  `json:"value"`
+}
+
+type ExtraEnvs struct {
+	Key   *string `json:"key"`
+	Value *string `json:"value"`
+}
+
 type CreateNodePayload struct {
-	NetworkSpecKey string        `json:"networkSpecKey"`
-	NodeSpecKey    *string       `json:"nodeSpecKey"`
-	NodeSpec       *string       `json:"nodeSpec"`
-	NodeType       string        `json:"nodeType"`
-	NodeName       string        `json:"nodeName"`
-	ClusterHash    string        `json:"clusterKey"`
-	Storage        *string       `json:"storage"`
-	InitFromBackup bool          `json:"initFromBackup"`
-	UseApiKey      bool          `json:"useApiKey"`
-	ImageVersion   *string       `json:"imageVersion"`
-	Client         *string       `json:"client"`
-	PublicPort     bool          `json:"publicPort"`
-	Metadata       *NodeMetadata `json:"metadata"`
+	NetworkSpecKey string            `json:"networkSpecKey"`
+	NodeSpecKey    *string           `json:"nodeSpecKey"`
+	NodeSpec       *NodeSpec         `json:"nodeSpec"`
+	NodeType       models.NodeType   `json:"nodeType"`
+	NodeName       string            `json:"nodeName"`
+	ClusterHash    string            `json:"clusterKey"`
+	Storage        *string           `json:"storage"`
+	InitFromBackup bool              `json:"initFromBackup"`
+	UseApiKey      bool              `json:"useApiKey"`
+	ImageVersion   *string           `json:"imageVersion"`
+	Client         *string           `json:"client"`
+	PublicPort     bool              `json:"publicPort"`
+	Metadata       *NodeMetadata     `json:"metadata"`
+	Config         *NodeLaunchConfig `json:"config"`
 }
 
 type UpdateNodePayload struct {
-	NodeSpecKey  *string       `json:"nodeSpecKey"`
-	NodeSpec     *string       `json:"nodeSpec"`
-	NodeType     *string       `json:"nodeType"`
-	NodeName     *string       `json:"nodeName"`
-	ImageVersion *string       `json:"imageVersion"`
-	Metadata     *NodeMetadata `json:"metadata"`
+	NodeSpecKey  *string           `json:"nodeSpecKey"`
+	NodeSpec     *NodeSpec         `json:"nodeSpec"`
+	NodeType     *string           `json:"nodeType"`
+	NodeName     *string           `json:"nodeName"`
+	ImageVersion *string           `json:"imageVersion"`
+	Metadata     *NodeMetadata     `json:"metadata"`
+	Config       *NodeLaunchConfig `json:"config"`
+}
+
+type UpdateNodeImagePayload struct {
+	ImageVersion *string `json:"imageVersion"`
+}
+
+type NodeSpec struct {
+	Key        string `json:"key"`
+	Multiplier int    `json:"multiplier"`
 }
 
 type NodeStatus struct {

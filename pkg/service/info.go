@@ -2,6 +2,7 @@ package service
 
 import (
 	"fmt"
+	"github.com/OnFinality-io/onf-cli/pkg/models"
 	"time"
 
 	"github.com/OnFinality-io/onf-cli/pkg/api"
@@ -47,15 +48,40 @@ type Protocols struct {
 	Name              string    `json:"name" header:"name"`
 	Derivable         bool      `json:"derivable" header:"derivable"`
 	ImageRepositories []string  `json:"imageRepositories" header:"images"`
+	Metadata          *Metadata `json:"metadata" header:"metadata"`
+}
+type ArgSectionItems []*ArgSectionItem
+
+func (ast ArgSectionItems) GetItem(key string) *ArgSectionItem {
+	for _, item := range ast {
+		if item.ExtraArgKey != nil && *item.ExtraArgKey == key {
+			return item
+		}
+	}
+	return nil
+}
+
+type ArgumentSections struct {
+	Sections  ArgSectionItems `json:"sections"`
+	Delimiter *string         `json:"delimiter"`
+}
+type ArgSectionItem struct {
+	Title       *string `json:"title"`
+	ExtraArgKey *string `json:"extraArgKey"`
+	Index       *int    `json:"index"`
+}
+type Metadata struct {
+	Rules            map[models.NodeType]interface{} `json:"rules" header:"rules"`
+	ArgumentSections *ArgumentSections               `json:"argumentSections" `
 }
 
 type NodeRecommendation struct {
-	Network      		string 		`json:"network" header:"network"`
-	NodeSpec     		string 		`json:"nodeSpec" header:"nodeSpec"`
-	NodeSpecMultiplier 	int      	`json:"nodeSpecMultiplier" header:"nodeSpecMultiplier"`
-	StorageSize  		int    		`json:"storageSize" header:"storageSize"`
-	ImageVersion 		string 		`json:"imageVersion" header:"imageVersion"`
-	Client       		string 		`json:"client" header:"client"`
+	Network            string `json:"network" header:"network"`
+	NodeSpec           string `json:"nodeSpec" header:"nodeSpec"`
+	NodeSpecMultiplier int    `json:"nodeSpecMultiplier" header:"nodeSpecMultiplier"`
+	StorageSize        int    `json:"storageSize" header:"storageSize"`
+	ImageVersion       string `json:"imageVersion" header:"imageVersion"`
+	Client             string `json:"client" header:"client"`
 }
 
 func GetInfo() (Info, error) {
@@ -76,4 +102,34 @@ func NodeRecommends(network string) (NodeRecommendation, error) {
 	var result NodeRecommendation
 	resp, d, errs := instance.Request(api.MethodGet, path, nil).EndStruct(&result)
 	return result, checkError(resp, d, errs)
+}
+
+func GetArgumentSectionsByProtocol(protocolKey string) (*ArgumentSections, error) {
+	info, err := GetInfo()
+	if err != nil {
+		return nil, err
+	}
+	for _, protocol := range info.Protocols {
+		if protocol.Key == protocolKey {
+			return protocol.Metadata.ArgumentSections, nil
+		}
+	}
+	return nil, fmt.Errorf("%s is not supported.", protocolKey)
+}
+
+func GetSupportedNodeTypes(protocolKey string) ([]models.NodeType, error) {
+	info, err := GetInfo()
+	if err != nil {
+		return nil, err
+	}
+	var nodeTypes []models.NodeType
+	for _, protocol := range info.Protocols {
+		if protocol.Key == protocolKey {
+			for key, _ := range protocol.Metadata.Rules {
+				nodeTypes = append(nodeTypes, key)
+			}
+			break
+		}
+	}
+	return nodeTypes, nil
 }
