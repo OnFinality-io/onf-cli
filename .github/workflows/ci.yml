@@ -2,7 +2,7 @@ name: build & upload
 
 on:
   push:
-    branches: [ feature/networkV2 ]
+    branches: [ master ]
   pull_request:
     branches: [ master ]
 
@@ -18,43 +18,46 @@ jobs:
         onf-version: [v0.1.0]
     runs-on:  ${{ matrix.os }}-latest
     steps:
-    - name: Check out code into the Go module directory
-      uses: actions/checkout@v2
-      with:
-        fetch-depth: 100
+      - name: Check out code into the Go module directory
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 100
 
-    - name: version check
-      uses: marceloprado/has-changed-path@v1
-      id: version
-      with:
-        paths: ./VERSION
+      - name: version check
+        uses: marceloprado/has-changed-path@v1
+        id: version
+        with:
+          paths: ./VERSION
 
-    - name: Set up Go 1.x
-      uses: actions/setup-go@v2
-      if: steps.version.outputs.changed == 'true'
-      with:
-        go-version: ${{ matrix.go-version }}
+      - name: Set up Go 1.x
+        uses: actions/setup-go@v2
+        if: steps.version.outputs.changed == 'true'
+        with:
+          go-version: ${{ matrix.go-version }}
 
-    - name: read version
-      uses: pCYSl5EDgo/cat@master
-      id: onf-version
-      if: steps.version.outputs.changed == 'true'
-      with:
-        path: VERSION
+      - name: read version
+        uses: pCYSl5EDgo/cat@master
+        id: onf-version
+        if: steps.version.outputs.changed == 'true'
+        with:
+          path: VERSION
 
-    - name: build linux
-      run: sh ./scripts/build/linux.sh
-    - name: build macos
-      run: sh ./scripts/build/osx.sh
-    - name: build window
-      run: sh ./scripts/build/windows.sh
-    
-    - name: upload
-      uses: "marvinpinto/action-automatic-releases@latest"
-      if: steps.version.outputs.changed == 'true'
-      with:
-        repo_token: "${{ secrets.GITHUB_TOKEN }}"
-        automatic_release_tag: v${{ steps.onf-version.outputs.text }}
-        prerelease: true
-        files: |
-          ./build/*
+      - name: build linux
+        if: steps.version.outputs.changed == 'true'
+        run: sh ./scripts/build/linux.sh
+      - name: build macos
+        if: steps.version.outputs.changed == 'true'
+        run: sh ./scripts/build/osx.sh
+      - name: build window
+        if: steps.version.outputs.changed == 'true'
+        run: sh ./scripts/build/windows.sh
+
+      - name: upload
+        uses: "marvinpinto/action-automatic-releases@latest"
+        if: steps.version.outputs.changed == 'true'
+        with:
+          repo_token: "${{ secrets.GITHUB_TOKEN }}"
+          automatic_release_tag: v${{ steps.onf-version.outputs.text }}
+          prerelease: false
+          files: |
+            ./build/*

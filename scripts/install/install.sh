@@ -5,7 +5,7 @@ reset="\033[0m"
 cyan="\033[36m"
 green="\033[32m"
 red="\033[31m"
-VERSION=$(curl -sS https://raw.githubusercontent.com/OnFinality-io/onf-cli/feature/networkV2/VERSION)
+VERSION=$(curl -sS https://raw.githubusercontent.com/OnFinality-io/onf-cli/master/VERSION)
 
 #Check OS
 if [ "$(uname)" = "Darwin" ]; then
