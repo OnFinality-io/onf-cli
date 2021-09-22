@@ -11,17 +11,27 @@ type Watcher struct {
 type WatcherFunc func(chan bool)
 
 func (w *Watcher) Run(fn WatcherFunc) {
-	d := time.Duration(w.Second * time.Second)
+	t := w.Second * time.Second
+	//d := time.Duration(t)
 	done := make(chan bool, 1)
-	t := time.NewTicker(d)
-	defer t.Stop()
-
+	//t := time.NewTicker(d)
+	//defer t.Stop()
 	for {
 		select {
 		case <-done:
 			return
-		case <-t.C:
+		case <-time.After(t):
 			fn(done)
 		}
+
 	}
+
+	//for {
+	//	select {
+	//	case <-done:
+	//		return
+	//	case <-t.C:
+	//		fn(done)
+	//	}
+	//}
 }

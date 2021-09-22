@@ -1,18 +1,28 @@
 networkSpec:
-  config:
     name: sample-testnet
     displayName: Sample Testnet
     protocol: substrate
     imageRepository: parity/substrate
-    metadata:
-      imageVersion: 2.0.0-533bbbd
-  chainSpec: "./chainspec.json"
+    imageVersion: 2.0.0-533bbbd
+    config:
+      nodeTypes:
+        full:
+          args:
+            - key: --chain
+              file: "sample/chainspec.json"
+          env:
+            - key: TEST
+              value: "TEST"
+        validator:
+          args:
+            - key: --chain
+              file: "sample/chainspec.json"
 validator:
   count: 3
   node:
     nodeName: boostrap-validator
     nodeType: validator
-    clusterKey: sy
+    clusterKey: sz
     nodeSpecKey: small
     initFromBackup: false
     publicPort: true
@@ -38,11 +48,11 @@ validator:
         publicKey: '0x439660b36c6c03afafca027b910b4fecf99801834c62a5e6006f27d978de234f'
         phrase: "//Charlie"
 bootNode:
-  count: 1
+  count: 3
   node:
     nodeName: boostrap-bootnode
     nodeType: full
-    clusterKey: sy
+    clusterKey: jm
     nodeSpecKey: small
     initFromBackup: false
     publicPort: true

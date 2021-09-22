@@ -1,0 +1,17 @@
+nodeName: Rococo bob
+nodeType: validator # full or validator
+clusterKey: sy # available values: `onf info cluster`
+nodeSpec:
+  key: unit
+  multiplier: 1
+networkSpecKey: 9db0b0fd-0b18-4aa2-ad29-4e3dfe777439    # available values: `onf network-spec list`
+initFromBackup: false # works only with polkadot and kusama for now
+publicPort: true
+useApiKey: true
+storage: 40Gi
+imageVersion: 2.0.0-533bbbd
+config:
+  extraArgs:
+    default:
+    - "--bob"
+    - "--bootnodes=/dns4/node-6838696206289858560-0.p2p.onfinality.me/tcp/12983/p2p/12D3KooWCHv4kEVm3hbg5XinNGgNUmotwJTox8Dv4kX5RfRG15HH"

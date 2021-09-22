@@ -3,13 +3,16 @@ package image
 import (
 	"fmt"
 	"github.com/OnFinality-io/onf-cli/pkg/service"
+	"github.com/OnFinality-io/onf-cli/pkg/utils"
 	"github.com/OnFinality-io/onf-cli/pkg/watcher"
+	"strings"
 )
 
 func ImageCheckProcess(imgRepo, version string, isPrintLog bool, checkSuccessFn func()) {
-	watcherFlags := watcher.WatcherFlags{2, true}
+	watcherFlags := watcher.WatcherFlags{Second: 3, Watch: true}
 	watcherFlags.ToWatch(func(done chan bool) {
-		imageCheckPayload := &service.ImageCheckPayload{ImageRepository: imgRepo, Version: &version}
+
+		imageCheckPayload := &service.ImagePayload{ImageRepository: imgRepo, Version: utils.String(strings.TrimSpace(version))}
 		imageCheckRet, err := service.CheckImage(imageCheckPayload)
 		if err != nil {
 			fmt.Println(err.Error())
@@ -31,6 +34,7 @@ func ImageCheckProcess(imgRepo, version string, isPrintLog bool, checkSuccessFn 
 			print(isPrintLog, "Image [%s] checked success.", image)
 			checkSuccessFn()
 			done <- true
+			return
 		default:
 			print(isPrintLog, "Check image [%s] status: %s", image, imageCheckRet.Status)
 		}

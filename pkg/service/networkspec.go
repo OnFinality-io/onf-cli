@@ -4,9 +4,15 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"github.com/OnFinality-io/onf-cli/cmd/networkspec/payload"
+	"github.com/OnFinality-io/onf-cli/pkg/models"
+	"github.com/OnFinality-io/onf-cli/pkg/utils"
 	"io/ioutil"
 	"net/http/httputil"
 	"net/url"
+	"path/filepath"
+	"sort"
+	"strings"
 	"time"
 
 	"github.com/OnFinality-io/onf-cli/pkg/api"
@@ -18,18 +24,18 @@ type BootNode struct {
 }
 
 type NetworkSpecMetadata struct {
-	Recommend        *Recommend    `json:"recommend,omitempty"`
-	ChainSpec        *string       `json:"chainspec,omitempty"`
-	ImageVersion     *string       `json:"imageVersion,omitempty"`
-	Command          *string       `json:"command,omitempty"`
-	VersionList      []string      `json:"versionList,omitempty"`
-	BootNodes        []interface{} `json:"bootnodes,omitempty"`
-	FetchRcChainspec *string       `json:"fetchRcChainspec,omitempty"`
-	RcChainspec      *string       `json:"rcChainspec,omitempty"`
-	RcExtraArgs      []string      `json:"rcExtraArgs,omitempty"`
-	ExtraArgs        []string      `json:"extraArgs,omitempty"`
-	ParachainId      *int          `json:"parachainId,omitempty"`
-	Cluster          *string       `json:"cluster,omitempty"`
+	Recommend        *Recommend `json:"recommend,omitempty"`
+	ChainSpec        *string    `json:"chainspec,omitempty"`
+	ImageVersion     *string    `json:"imageVersion,omitempty"`
+	Command          *string    `json:"command,omitempty"`
+	VersionList      []string   `json:"versionList,omitempty"`
+	BootNodes        []string   `json:"bootnodes,omitempty"`
+	FetchRcChainspec *string    `json:"fetchRcChainspec,omitempty"`
+	RcChainspec      *string    `json:"rcChainspec,omitempty"`
+	RcExtraArgs      []string   `json:"rcExtraArgs,omitempty"`
+	ExtraArgs        []string   `json:"extraArgs,omitempty"`
+	ParachainId      *int       `json:"parachainId,omitempty"`
+	Cluster          *string    `json:"cluster,omitempty"`
 }
 
 type Recommend struct {
@@ -48,7 +54,7 @@ type NetworkSpec struct {
 	Name            string              `json:"name" `
 	DisplayName     string              `json:"displayName" header:"Name"`
 	ProtocolKey     string              `json:"protocolKey" header:"Protocol"`
-	IsSystem        bool                `json:"isSystem" header:"System"`
+	IsPublic        bool                `json:"isPublic" header:"Public"`
 	ImageRepository string              `json:"imageRepository" header:"Image"`
 	WorkspaceID     uint64              `json:"workspaceId,string"`
 	Status          string              `json:"status"`
@@ -57,18 +63,40 @@ type NetworkSpec struct {
 	UpdatedAt       time.Time           `json:"updatedAt" `
 	Recommend       *Recommend          `json:"recommend,omitempty"`
 	NodeTypes       []SpecNodeType      `json:"nodeTypes,omitempty"`
+	Config          *models.Config      `json:"config"`
+}
+
+func (c *NetworkSpec) MergeConfig(config *models.Config) {
+	if c.Config == nil {
+		c.Config = config
+	} else {
+		for nodeType, newOperation := range config.Operations {
+			// Exist
+			if originalOperation, ok := c.Config.Operations[nodeType]; ok {
+				originalOperation.Var.Merge(newOperation.Var)
+				originalOperation.Env.Merge(newOperation.Env)
+				originalOperation.Arg.Merge(newOperation.Arg)
+			} else {
+				c.Config.Operations[nodeType] = newOperation
+			}
+		}
+	}
+
 }
 
 type CreateNetworkSpecPayload struct {
-	Name            string              `json:"name"`
-	DisplayName     string              `json:"displayName"`
-	Protocol        string              `json:"protocol"`
-	ImageRepository string              `json:"imageRepository"`
-	Metadata        NetworkSpecMetadata `json:"metadata"`
+	Name            string  `json:"name"`
+	DisplayName     string  `json:"displayName"`
+	Protocol        string  `json:"protocol"`
+	ImageRepository string  `json:"imageRepository"`
+	ImageVersion    *string `json:"imageVersion,omitempty"`
+	//Metadata        *NetworkSpecMetadata     `json:"metadata"`
+	Config *payload.ConfigPayload `json:"config"`
 }
 
 type UpdateNetworkSpecPayload struct {
-	Metadata *NetworkSpecMetadata `json:"metadata"`
+	DisplayName *string                `json:"displayName"`
+	Config      *payload.ConfigPayload `json:"config"`
 }
 
 type GenerateChainSpecPayload struct {
@@ -96,68 +124,97 @@ type BootstrapChainSpecNode struct {
 	NodeName string                     `json:"nodeName"`
 	Metadata BootstrapChainSpecMetadata `json:"metadata"`
 }
+type CreateNetworkSpecModel struct {
+	Name            string               `json:"name"`
+	DisplayName     string               `json:"displayName"`
+	Protocol        string               `json:"protocol"`
+	ImageRepository string               `json:"imageRepository"`
+	Metadata        *NetworkSpecMetadata `json:"metadata"`
+	Config          *models.Config       `json:"config"`
+}
+type UpdateNetworkSpecModel struct {
+	DisplayName *string        `json:"displayName"`
+	Config      *models.Config `json:"config"`
+}
 
 func GetNetworkSpecs(wsID uint64) ([]NetworkSpec, error) {
 	var specs []NetworkSpec
 	path := fmt.Sprintf("/workspaces/%d/network-specs", wsID)
-	resp, d, errs := instance.Request(api.MethodGet, path, nil).EndStruct(&specs)
+	resp, d, errs := instance.Ver2().Request(api.MethodGet, path, nil).EndStruct(&specs)
 	return specs, checkError(resp, d, errs)
 }
-
 func CreateNetworkSpecs(wsID uint64, payload *CreateNetworkSpecPayload) (*NetworkSpec, error) {
+	argumentSections, err := GetArgumentSectionsByProtocol(payload.Protocol)
+	if err != nil {
+		return nil, err
+	}
+	config := TransformConfig(wsID, payload.Config, argumentSections)
+
+	chainSpec := obtainChainSpec(config)
+	p := &CreateNetworkSpecModel{
+		DisplayName:     payload.DisplayName,
+		Name:            payload.Name,
+		ImageRepository: payload.ImageRepository,
+		Protocol:        payload.Protocol,
+		Metadata: &NetworkSpecMetadata{
+			ImageVersion: payload.ImageVersion,
+			ChainSpec:    chainSpec,
+		},
+		Config: config,
+	}
 	path := fmt.Sprintf("/workspaces/%d/network-specs", wsID)
 	spec := &NetworkSpec{}
-	resp, d, errs := instance.Request(api.MethodPost, path, &api.RequestOptions{
-		Body: payload,
+	resp, d, errs := instance.Ver2().Request(api.MethodPost, path, &api.RequestOptions{
+		Body: p,
 	}).EndStruct(spec)
 	return spec, checkError(resp, d, errs)
 }
 
+func obtainChainSpec(config *models.Config) *string {
+	if config == nil {
+		return nil
+	}
+	var chainSpec *string
+	for _, operations := range config.Operations {
+		for _, variable := range operations.Var {
+			if strings.HasPrefix(variable.Payload.Key, "--chain") {
+				if variable.Payload.Value.ValueType == models.File {
+					if file, ok := variable.Payload.Value.Payload.(models.FileTypeValue); ok {
+						chainSpec = utils.String(fmt.Sprintf("/chain-data/%s", file.Destination))
+					}
+				} else if variable.Payload.Value.ValueType == models.String {
+					chainSpec = variable.Payload.Value.Payload.(*string)
+				}
+			}
+		}
+	}
+	return chainSpec
+}
+
 func DeleteNetworkSpecs(wsID uint64, networkID string) error {
 	path := fmt.Sprintf("/workspaces/%d/network-specs/%s", wsID, networkID)
-	resp, d, errs := instance.Request(api.MethodDelete, path, nil).EndBytes()
+	resp, d, errs := instance.Ver2().Request(api.MethodDelete, path, nil).EndBytes()
 	return checkError(resp, d, errs)
 }
 
 func GetNetworkSpec(wsID uint64, networkID string) (*NetworkSpec, error) {
 	var specs *NetworkSpec
 	path := fmt.Sprintf("/workspaces/%d/network-specs/%s", wsID, networkID)
-	resp, d, errs := instance.Request(api.MethodGet, path, nil).EndStruct(&specs)
+	resp, d, errs := instance.Ver2().Request(api.MethodGet, path, nil).EndStruct(&specs)
 	return specs, checkError(resp, d, errs)
 }
 
-func GenerateChainSpec(wsID uint64, networkID string, payload *GenerateChainSpecPayload) (*GenerateChainSpecResult, error) {
-	var result *GenerateChainSpecResult
-	path := fmt.Sprintf("/workspaces/%d/private-chains/%s/chainSpec/generate", wsID, networkID)
-
-	resp, d, errs := instance.Request(api.MethodPost, path, &api.RequestOptions{
-		Body: payload,
-	}).EndBytes()
-	err := json.Unmarshal(d, &result)
-	if err != nil {
-		if len(d) > 0 {
-			result = &GenerateChainSpecResult{TaskId: string(d)}
-		}
-	}
-	return result, checkError(resp, d, errs)
-}
-func BootstrapChainSpec(wsID uint64, networkID string, payload *BootstrapChainSpecPayload) (*NetworkSpec, error) {
-	path := fmt.Sprintf("/workspaces/%d/private-chains/%s/bootstrap", wsID, networkID)
-	node := &NetworkSpec{}
-	resp, d, errs := instance.Request(api.MethodPost, path, &api.RequestOptions{
-		Body: payload,
-	}).EndStruct(node)
-	return node, checkError(resp, d, errs)
-}
-
 type UploadResult struct {
-	Success bool `json:"success"`
+	Key *string `json:"key"`
 }
 
-func UploadChainSpec(wsID uint64, networkID string, files []string) (*UploadResult, error) {
-	path := fmt.Sprintf("/workspaces/%d/private-chains/%s/chainSpec/upload", wsID, networkID)
+func UploadPrivateFile(wsID uint64, files []string) (*UploadResult, error) {
+	//path := fmt.Sprintf("/private-file/upload")
+	path := fmt.Sprintf("/workspaces/%d/private-file/upload", wsID)
+	f := files[0]
+	_, file := filepath.Split(f)
 	req := instance.Upload(path, &api.RequestOptions{Files: map[string]string{
-		"chainspec.json": files[0],
+		file: f,
 	}})
 	req.TargetType = req.ForceType
 
@@ -200,10 +257,154 @@ func UploadChainSpec(wsID uint64, networkID string, files []string) (*UploadResu
 	return uploadRet, nil
 }
 
-func UpdateNetworkSpecMetadata(wsID uint64, networkID string, metadata *NetworkSpecMetadata) error {
-	path := fmt.Sprintf("/workspaces/%d/network-specs/%s/metadata", wsID, networkID)
-	resp, d, errs := instance.Request(api.MethodPost, path, &api.RequestOptions{
-		Body: metadata,
+func UpdateNetworkSpec(wsID uint64, networkID string, payload *UpdateNetworkSpecPayload) error {
+
+	spec, err := GetNetworkSpec(wsID, networkID)
+	if err != nil {
+		return err
+	}
+	argumentSections, err := GetArgumentSectionsByProtocol(spec.ProtocolKey)
+	if err != nil {
+		return err
+	}
+	transformConfig := TransformConfig(wsID, payload.Config, argumentSections)
+	spec.MergeConfig(transformConfig)
+	displayName := payload.DisplayName
+	if payload.DisplayName == nil {
+		displayName = &spec.DisplayName
+	}
+	p := &UpdateNetworkSpecModel{
+		DisplayName: displayName,
+		Config:      spec.Config,
+	}
+
+	path := fmt.Sprintf("/workspaces/%d/network-specs/%s", wsID, networkID)
+	resp, d, errs := instance.Ver2().Request(api.MethodPut, path, &api.RequestOptions{
+		Body: p,
 	}).EndBytes()
 	return checkError(resp, d, errs)
+}
+
+type ArgPayloadWrap struct {
+	Key     *string
+	Value   []*string
+	File    *string
+	Section *int
+	Action  *models.Action
+}
+
+func TransformConfig(wsID uint64, payload *payload.ConfigPayload, argumentSections *ArgumentSections) *models.Config {
+	if payload == nil {
+		return nil
+	}
+
+	config := &models.Config{Operations: map[models.NodeType]*models.RuleOperationCollection{}}
+
+	for nodeType, rule := range payload.NodeTypes {
+		argPayloads := make([][]*ArgPayloadWrap, 5)
+		sectionIndex := 0
+		for _, argPayload := range rule.Args {
+			if argumentSections.Delimiter != nil && strings.Compare(*argPayload.Key, *argumentSections.Delimiter) == 0 {
+				sectionIndex++
+				continue
+			}
+			argSections := argumentSections.Sections
+			sort.SliceStable(argSections, func(i, j int) bool {
+				return *argSections[i].Index < *argSections[j].Index
+			})
+			section := argumentSections.Sections[sectionIndex].Index
+			skip := false
+			for _, argWrap := range argPayloads[sectionIndex] {
+				if strings.Compare(*argWrap.Key, *argPayload.Key) == 0 {
+					argWrap.Value = append(argWrap.Value, argPayload.Value)
+					skip = true
+					break
+				}
+			}
+
+			if skip == false {
+				var value []*string
+				if argPayload.Value != nil {
+					value = []*string{argPayload.Value}
+				}
+
+				argPayloads[sectionIndex] = append(argPayloads[sectionIndex], &ArgPayloadWrap{
+					Key:     argPayload.Key,
+					File:    argPayload.File,
+					Value:   value,
+					Action:  argPayload.Action,
+					Section: section,
+				})
+			}
+		}
+		vars, args, envs := transformConfigs(wsID, argPayloads)
+		config.Operations[nodeType] = &models.RuleOperationCollection{Var: vars, Arg: args, Env: envs}
+	}
+
+	return config
+}
+
+func transformConfigs(wsID uint64, payload [][]*ArgPayloadWrap) ([]*models.Var, []*models.Arg, []*models.Env) {
+	vars := make([]*models.Var, 0)
+	args := make([]*models.Arg, 0)
+	envs := make([]*models.Env, 0)
+	for i, payload := range payload {
+		for _, argPayload := range payload {
+			if argPayload.Key == nil {
+				continue
+			}
+			key := fmt.Sprintf("%s_%d", *argPayload.Key, i)
+			file := argPayload.File
+			value := argPayload.Value
+			variable := &models.Var{
+				RuleOperation: models.RuleOperation{Action: models.ADD},
+				Payload: &models.VarModel{
+					Key:      key,
+					Options:  models.Options{Overwritable: true},
+					Category: models.VAR,
+					Value:    &models.VarValue{},
+				}}
+			if argPayload.Action != nil {
+				variable.Action = *argPayload.Action
+			}
+
+			if file != nil {
+				uploadRet, err := UploadPrivateFile(wsID, []string{*file})
+				if err != nil {
+					fmt.Println(err.Error())
+				}
+				_, fileName := filepath.Split(*file)
+				fileBucket := uploadRet.Key
+				variable.Payload.Value.ValueType = models.File
+				variable.Payload.Value.Payload = models.FileTypeValue{Source: fileBucket, Destination: fileName}
+			} else if value != nil && len(value) > 0 {
+				if len(value) > 1 {
+					variable.Payload.Value.ValueType = models.StringArray
+					variable.Payload.Value.Payload = value
+				} else {
+					variable.Payload.Value.ValueType = models.String
+					variable.Payload.Value.Payload = value[0]
+				}
+			} else {
+				variable.Payload.Value.ValueType = models.Empty
+			}
+			vars = append(vars, variable)
+			arg := &models.Arg{
+				RuleOperation: models.RuleOperation{Action: models.ADD},
+				Payload: &models.ArgModel{
+					Key:      *argPayload.Key,
+					Category: models.ARG,
+					Options:  models.Options{Overwritable: true},
+					Value: &models.ValueModel{
+						InputType: models.Variable,
+						Payload:   fmt.Sprintf("var.%s", key),
+					},
+					Section: argPayload.Section,
+				}}
+			args = append(args, arg)
+		}
+	}
+
+	return vars, args, envs
+
 }

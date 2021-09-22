@@ -27,3 +27,10 @@ func RandString(len int) string {
 	}
 	return string(bytes)
 }
+
+func Min(a, b int) int {
+	if a <= b {
+		return a
+	}
+	return b
+}

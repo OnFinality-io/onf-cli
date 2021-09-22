@@ -1,13 +1,20 @@
-nodeName: cli-test
-nodeType: full # full or validator
-clusterKey: jm # available values: `onf info cluster`
-nodeSpecKey: medium # small, medium, large
-networkSpecKey: kusama # available values: `onf network-spec list`
+nodeName: cli-test-validator
+nodeType: validator # full or validator
+clusterKey: sy # available values: `onf info cluster`
+networkSpecKey:  # available values: `onf network-spec list`
 initFromBackup: true # works only with polkadot and kusama for now
 publicPort: true
 useApiKey: true
 storage: 40Gi
-imageVersion: v0.8.29
-metadata:
-  extraArgs: []
-  # - --bootnodes=/dns4/node-6747330110807130112-0.p2p.onfinality.io/tcp/17911/p2p/12D3KooWHw6o6xaky49NjpsJkPcuHZUb2KfprFRmRNfBkeur3Qo1
+imageVersion: 2.0.0-533bbbd
+nodeSpec:
+  key: unit
+  multiplier: 1
+config:
+  extraArgs:
+    default:
+      - "--wasm-execution=Compiled"
+
+  extraEnvs:
+    - key: TEST_ENV
+      value: test_env

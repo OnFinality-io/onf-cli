@@ -1,16 +1,13 @@
 package network
 
-import "github.com/OnFinality-io/onf-cli/pkg/service"
+import (
+	"github.com/OnFinality-io/onf-cli/pkg/service"
+)
 
 type CfgBootstrap struct {
-	NetworkSpec CfgNetworkSpec `json:"networkSpec"`
+	NetworkSpec *service.CreateNetworkSpecPayload `json:"networkSpec"`
 	Validator   CfgValidator   `json:"validator"`
 	BootNode    CfgBootNode    `json:"bootNode"`
-}
-
-type CfgNetworkSpec struct {
-	Config    service.CreateNetworkSpecPayload `json:"config"`
-	ChainSpec string                           `json:"chainSpec"`
 }
 
 type CfgValidator struct {

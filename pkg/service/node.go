@@ -2,12 +2,11 @@ package service
 
 import (
 	"fmt"
-
 	"github.com/OnFinality-io/onf-cli/pkg/api"
 )
 
-func GetNodeList(wsID uint64) ([]NodeListItem, error) {
-	var nodes []NodeListItem
+func GetNodeList(wsID uint64) ([]NodeItem, error) {
+	var nodes []NodeItem
 	path := fmt.Sprintf("/workspaces/%d/nodes", wsID)
 	resp, d, errs := instance.Request(api.MethodGet, path, nil).EndStruct(&nodes)
 	return nodes, checkError(resp, d, errs)
@@ -45,7 +44,16 @@ func TerminateNode(wsID, nodeID uint64) error {
 }
 
 func UpdateNode(wsID, nodeID uint64, data *UpdateNodePayload) error {
+	//transformSection(data.Config)
 	path := fmt.Sprintf("/workspaces/%d/nodes/%d/update", wsID, nodeID)
+	resp, d, errs := instance.Ver2().Request(api.MethodPost, path, &api.RequestOptions{
+		Body: data,
+	}).End()
+	return checkError(resp, []byte(d), errs)
+}
+
+func UpdateImage(wsID, nodeID uint64, data *UpdateNodeImagePayload) error {
+	path := fmt.Sprintf("/workspaces/%d/nodes/%d/update-image", wsID, nodeID)
 	resp, d, errs := instance.Request(api.MethodPost, path, &api.RequestOptions{
 		Body: data,
 	}).End()
@@ -53,9 +61,10 @@ func UpdateNode(wsID, nodeID uint64, data *UpdateNodePayload) error {
 }
 
 func CreateNode(wsID uint64, data *CreateNodePayload) (*Node, error) {
+	//transformSection(data.Config)
 	path := fmt.Sprintf("/workspaces/%d/nodes", wsID)
 	node := &Node{}
-	resp, d, errs := instance.Request(api.MethodPost, path, &api.RequestOptions{
+	resp, d, errs := instance.Ver2().Request(api.MethodPost, path, &api.RequestOptions{
 		Body: data,
 	}).EndStruct(node)
 	return node, checkError(resp, d, errs)
@@ -77,3 +86,20 @@ func GetNodeStatus(wsID, nodeID uint64) (*NodeStatus, error) {
 	resp, d, errs := instance.Request(api.MethodGet, path, nil).EndStruct(&node)
 	return &node, checkError(resp, d, errs)
 }
+
+//func transformSection(config *NodeLaunchConfig) {
+//	if config != nil {
+//		sectionNum := 0
+//		Section := sectionNum*200 + 100
+//		var extraArgs []*ExtraArgs
+//		for _, arg := range config.ExtraArgs {
+//			if strings.Compare(*arg.Key, "--") == 0 {
+//				sectionNum++
+//				Section = sectionNum*200 + 100
+//				continue
+//			}
+//			extraArgs = append(extraArgs, &ExtraArgs{Key: arg.Key, Value: arg.Value, Section: Section})
+//		}
+//		config.ExtraArgs = extraArgs
+//	}
+//}

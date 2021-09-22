@@ -3,8 +3,10 @@ package main
 import (
 	"errors"
 	"fmt"
+	"github.com/OnFinality-io/onf-cli/cmd/image"
 	"log"
 	"path"
+	"strings"
 
 	"github.com/OnFinality-io/onf-cli/cmd/network"
 	"github.com/OnFinality-io/onf-cli/cmd/networkspec"
@@ -27,9 +29,10 @@ func init() {
 	viper.SetDefault("app.name", "onf-cli")
 	viper.SetDefault("app.version", version)
 	viper.SetDefault("git.commit", gitCommit)
-	viper.SetDefault("base_url", "https://api.onfinality.io/api/v1")
+	viper.SetDefault("base_url", "https://api.onfinality.io/api")
 	viper.SetEnvPrefix("onf")
 	viper.BindEnv("base_url")
+	viper.AutomaticEnv()
 }
 
 func checkSetup() bool {
@@ -56,17 +59,23 @@ func main() {
 		SilenceUsage:  true,
 		SilenceErrors: true,
 		PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
-			if !checkSetup() {
-				return errors.New("please run `onf setup` to initial the configurations")
+
+			accessKey := viper.GetString("access_key")
+			secretKey := viper.GetString("secret_key")
+			if accessKey == "" || secretKey == "" {
+				if !checkSetup() {
+					return errors.New("please run `onf setup` to initial the configurations")
+				}
+				loadConfig()
+				accessKey = viper.GetString(fmt.Sprintf("%s.onf_access_key", profile))
+				secretKey = viper.GetString(fmt.Sprintf("%s.onf_secret_key", profile))
 			}
-			loadConfig()
-			accessKey := viper.GetString(fmt.Sprintf("%s.onf_access_key", profile))
-			secretKey := viper.GetString(fmt.Sprintf("%s.onf_secret_key", profile))
+
 			baseURL := viper.GetString("base_url")
 			if accessKey == "" || secretKey == "" {
 				return errors.New("invalid accessKey or secretKey")
 			}
-			service.Init(accessKey, secretKey, baseURL)
+			service.Init(strings.TrimSpace(accessKey), strings.TrimSpace(secretKey), baseURL)
 			return nil
 		},
 	}
@@ -84,6 +93,7 @@ func main() {
 		info.NewCmd(),
 		setup.NewCmd(),
 		network.NewCmd(),
+		image.NewCmd(),
 	)
 	if err := rootCmd.Execute(); err != nil {
 		fmt.Println(err)
