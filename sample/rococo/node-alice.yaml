@@ -8,7 +8,8 @@ publicPort: true
 useApiKey: true
 storage: 40Gi
 imageVersion: v0.9.7
-metadata:
+config:
   extraArgs:
-  - --alice
+    default:
+      - "--alice"
 

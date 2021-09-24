@@ -2,7 +2,17 @@ name: rococo-local
 displayName: Rococo created by cli
 protocol: substrate
 imageRepository: parity/polkadot
-metadata:
-  chainspec: rococo-local
-  imageVersion: v0.9.7 # the default image version to launch nodes
-  cluster: lh # restrict new nodes to only this specific cluster, not required but will make things easier
+imageVersion: v0.9.7
+config:
+  nodeTypes:
+    full:
+      args:
+        - key: --chain
+          value: "rococo-local"
+      env:
+        - key: TEST
+          value: "TEST"
+    validator:
+      args:
+        - key: --chain
+          value: "rococo-local"

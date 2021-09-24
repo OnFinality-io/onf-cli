@@ -14,7 +14,6 @@ config:
   extraArgs:
     default:
       - "--wasm-execution=Compiled"
-
   extraEnvs:
     - key: TEST_ENV
       value: test_env
