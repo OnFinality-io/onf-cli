@@ -101,11 +101,18 @@ func bootstrapCmd() *cobra.Command {
 				argPayloads = append(argPayloads, &payload.ArgPayload{Key: utils.String(bootnodes), Value: utils.String(addr)})
 			}
 
+
+			nodeTypes,err := service.GetSupportedNodeTypes(spec.ProtocolKey)
+			NodeTypes := map[models.NodeType]*payload.ConfigRule{}
+			for _, nodeType := range nodeTypes {
+				NodeTypes[nodeType] = &payload.ConfigRule{
+					Args:argPayloads,
+				}
+			}
+
 			err = service.UpdateNetworkSpec(wsID, spec.Key, &service.UpdateNetworkSpecPayload{
 				Config: &payload.ConfigPayload{
-					NodeTypes: map[models.NodeType]*payload.ConfigRule{
-						cfg.BootNode.Node.NodeType: &payload.ConfigRule{Args: argPayloads},
-					},
+					NodeTypes: NodeTypes,
 				},
 			})
 			if err != nil {
@@ -200,15 +207,20 @@ func CreateValidator(cfgValidator CfgValidator, spec *service.NetworkSpec) []*Cr
 							return
 						}
 					})
-					argPayloads := []*payload.ArgPayload{{Key: utils.String(bootnodes), Value: utils.String(nodeDetail.Endpoints.P2p)}}
+
+					nodeTypes,err := service.GetSupportedNodeTypes(spec.ProtocolKey)
+					NodeTypes := map[models.NodeType]*payload.ConfigRule{}
+					for _, nodeType := range nodeTypes {
+						NodeTypes[nodeType] = &payload.ConfigRule{
+							Args:[]*payload.ArgPayload{{Key: utils.String(bootnodes), Value: utils.String(nodeDetail.Endpoints.P2p)}},
+						}
+					}
 
 					// update networkspec
 					err = service.UpdateNetworkSpec(wsID, conf.NetworkSpecKey,
 						&service.UpdateNetworkSpecPayload{
 							Config: &payload.ConfigPayload{
-								NodeTypes: map[models.NodeType]*payload.ConfigRule{
-									cfgValidator.Node.NodeType: {Args: argPayloads},
-								},
+								NodeTypes: NodeTypes,
 							},
 						},
 					)

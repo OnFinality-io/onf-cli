@@ -13,7 +13,7 @@ networkSpec:
             - key: --
             - key: --chain
               file: "rococo-local.json"
-            - key: --bootnodes
+            - key: --bootnodes # relay chain p2p Address
               value: "/dns4/node-6846996843709550592-0.p2p.onfinality.io/tcp/14136/p2p/12D3KooWGQMUeanG3Tco4usGxdkpVzcA23zSfpfD9fCcp3yX93Cm"
         collator:
           args:
@@ -22,7 +22,7 @@ networkSpec:
             - key: --
             - key: --chain
               file: "rococo-local.json"
-            - key: --bootnodes
+            - key: --bootnodes # relay chain p2p Address
               value: "/dns4/node-6846996843709550592-0.p2p.onfinality.io/tcp/14136/p2p/12D3KooWGQMUeanG3Tco4usGxdkpVzcA23zSfpfD9fCcp3yX93Cm"
 validator:
   count: 3
