@@ -101,12 +101,11 @@ func bootstrapCmd() *cobra.Command {
 				argPayloads = append(argPayloads, &payload.ArgPayload{Key: utils.String(bootnodes), Value: utils.String(addr)})
 			}
 
-
-			nodeTypes,err := service.GetSupportedNodeTypes(spec.ProtocolKey)
+			nodeTypes, err := service.GetSupportedNodeTypes(spec.ProtocolKey)
 			NodeTypes := map[models.NodeType]*payload.ConfigRule{}
 			for _, nodeType := range nodeTypes {
 				NodeTypes[nodeType] = &payload.ConfigRule{
-					Args:argPayloads,
+					Args: argPayloads,
 				}
 			}
 
@@ -167,9 +166,14 @@ type CreateNodeResult struct {
 func CreateValidator(cfgValidator CfgValidator, spec *service.NetworkSpec) []*CreateNodeResult {
 	validatorCount := cfgValidator.Count
 	nodeChan := make(chan *CreateNodeResult, validatorCount)
+	sudoArgs := cfgValidator.SudoArgs
+
 	for i := 0; i < validatorCount; i++ {
 		conf := cfgValidator.Node
 		conf.NodeName = fmt.Sprintf("%s-%d", conf.NodeName, i)
+
+		assignSudoArgs(i, sudoArgs, &conf, spec)
+
 		createdNode, err := service.CreateNode(wsID, &conf)
 		if err != nil {
 			return []*CreateNodeResult{{Error: err}}
@@ -208,11 +212,11 @@ func CreateValidator(cfgValidator CfgValidator, spec *service.NetworkSpec) []*Cr
 						}
 					})
 
-					nodeTypes,err := service.GetSupportedNodeTypes(spec.ProtocolKey)
+					nodeTypes, err := service.GetSupportedNodeTypes(spec.ProtocolKey)
 					NodeTypes := map[models.NodeType]*payload.ConfigRule{}
 					for _, nodeType := range nodeTypes {
 						NodeTypes[nodeType] = &payload.ConfigRule{
-							Args:[]*payload.ArgPayload{{Key: utils.String(bootnodes), Value: utils.String(nodeDetail.Endpoints.P2p)}},
+							Args: []*payload.ArgPayload{{Key: utils.String(bootnodes), Value: utils.String(nodeDetail.Endpoints.P2p)}},
 						}
 					}
 
@@ -314,24 +318,7 @@ func CreateBootNode(exArgs []string, bootNode CfgBootNode, spec *service.Network
 			conf := bootNode.Node
 			conf.NodeName = fmt.Sprintf("%s-%d", conf.NodeName, idx)
 
-			extraArgs := make(service.ExtraArgs)
-			if conf.Config == nil {
-				if spec.ProtocolKey == Substrate {
-					extraArgs["default"] = &exArgs
-				} else if spec.ProtocolKey == ProtocolParachainKey {
-					extraArgs["parachain"] = &exArgs
-				}
-				conf.Config = &service.NodeLaunchConfig{ExtraArgs: &extraArgs}
-			} else {
-				if spec.ProtocolKey == Substrate {
-					argsPayload := extraArgs["default"]
-					*argsPayload = append(*argsPayload, exArgs...)
-				} else if spec.ProtocolKey == ProtocolParachainKey {
-					argsPayload := extraArgs["parachain"]
-					*argsPayload = append(*argsPayload, exArgs...)
-				}
-
-			}
+			assignSudoArgs(idx, bootNode.SudoArgs, &conf, spec)
 
 			node, err := service.CreateNode(wsID, &conf)
 			if err != nil {
@@ -370,4 +357,26 @@ func CreateBootNode(exArgs []string, bootNode CfgBootNode, spec *service.Network
 	}
 
 	return nodeRet
+}
+func assignSudoArgs(nodeNum int, sudoArgs []string, conf *service.CreateNodePayload, spec *service.NetworkSpec) {
+	if nodeNum < len(sudoArgs) {
+		sudoArg := sudoArgs[nodeNum]
+		extraArgs := make(service.ExtraArgs)
+		if conf.Config == nil {
+			if spec.ProtocolKey == Substrate {
+				extraArgs["default"] = &[]string{sudoArg}
+			} else if spec.ProtocolKey == ProtocolParachainKey {
+				extraArgs["parachain"] = &[]string{sudoArg}
+			}
+			conf.Config = &service.NodeLaunchConfig{ExtraArgs: &extraArgs}
+		} else {
+			if spec.ProtocolKey == Substrate {
+				argsPayload := extraArgs["default"]
+				*argsPayload = append(*argsPayload, sudoArg)
+			} else if spec.ProtocolKey == ProtocolParachainKey {
+				argsPayload := extraArgs["parachain"]
+				*argsPayload = append(*argsPayload, sudoArg)
+			}
+		}
+	}
 }

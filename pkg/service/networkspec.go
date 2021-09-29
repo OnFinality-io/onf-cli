@@ -357,7 +357,7 @@ func transformConfigs(wsID uint64, payload [][]*ArgPayloadWrap) ([]*models.Var, 
 			file := argPayload.File
 			value := argPayload.Value
 			variable := &models.Var{
-				RuleOperation: models.RuleOperation{Action: models.ADD},
+				RuleOperation: models.RuleOperation{Action: models.UPSERT},
 				Payload: &models.VarModel{
 					Key:      key,
 					Options:  models.Options{Overwritable: true},
@@ -390,7 +390,7 @@ func transformConfigs(wsID uint64, payload [][]*ArgPayloadWrap) ([]*models.Var, 
 			}
 			vars = append(vars, variable)
 			arg := &models.Arg{
-				RuleOperation: models.RuleOperation{Action: models.ADD},
+				RuleOperation: models.RuleOperation{Action: models.UPSERT},
 				Payload: &models.ArgModel{
 					Key:      *argPayload.Key,
 					Category: models.ARG,

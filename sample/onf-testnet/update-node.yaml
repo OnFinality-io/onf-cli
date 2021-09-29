@@ -1,16 +1,5 @@
-nodeName: karura-bob
-nodeType: collator # full or validator
-clusterKey: jm # available values: `onf info cluster`
-networkSpecKey:  # available values: `onf network-spec list`
-initFromBackup: true # works only with polkadot and kusama for now
-publicPort: true
-useApiKey: true
-storage: 30Gi
-imageVersion: 1.4.1
-nodeSpec:
-  key: unit
-  multiplier: 3
 config:
   extraArgs:
     parachain:
       - "--charlie"
+      - "-lparachain::candidate-backing=trace,parachain::candidate-selection=trace,parachain::pvf=trace,parachain::collator-protocol=trace,parachain::provisioner=trace"
