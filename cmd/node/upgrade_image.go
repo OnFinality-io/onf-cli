@@ -58,19 +58,19 @@ func upgradeNode(wsID uint64, networkID string, version string) error {
 			fmt.Println(err.Error())
 			return
 		}
-		batchUpgrade(wsID, err, version)
+		batchUpgrade(wsID, networkID, err, version)
 	})
 
 	return err
 }
 
-func batchUpgrade(wsID uint64, err error, version string) {
+func batchUpgrade(wsID uint64, networkID string, err error, version string) {
 	nodeList, err := service.GetNodeList(wsID)
 	nodeLen := len(nodeList)
 	toBeUpgradeNodes := make(map[string]*[]service.NodeItem, nodeLen)
 	for _, node := range nodeList {
 		//if node.Status != Terminated && node.Status != Terminating && strings.Compare(nodeImageVersion, version) != 0 {
-		if node.Status != Terminated && node.Status != Terminating {
+		if node.NetworkSpecKey == networkID {
 			if node.Status == Running || node.Status == Error {
 				if nodeList, ok := toBeUpgradeNodes[node.ClusterHash]; ok {
 					*nodeList = append(*nodeList, node)
