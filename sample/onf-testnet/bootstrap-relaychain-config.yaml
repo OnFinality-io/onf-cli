@@ -18,7 +18,7 @@ networkSpec:
           file: rococo-local.json
 validator:
   count: 3
-  sudoArgs:
+  sudoArgs: #sudo args is to reduce the setting of sudo users for each node. For example, there will be 3 nodes running, the first node will be assgin --alice, the second node will be assgin --bob, and the third will be assgin --charlie. 
     - --alice
     - --bob
     - --charlie
