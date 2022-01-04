@@ -20,7 +20,9 @@ validator:
     nodeName: boostrap-validator
     nodeType: validator
     clusterKey: lh
-    nodeSpecKey: small
+    nodeSpec: # Specify the specifications of the node.
+      key: unit
+      multiplier: 2
     initFromBackup: false
     publicPort: true
     useApiKey: true
@@ -44,7 +46,9 @@ bootNode:
     nodeName: boostrap-bootnode
     nodeType: full
     clusterKey: lh
-    nodeSpecKey: small
+    nodeSpec: # Specify the specifications of the node.
+      key: unit
+      multiplier: 2
     initFromBackup: false
     publicPort: true
     useApiKey: true
