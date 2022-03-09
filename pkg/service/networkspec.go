@@ -4,9 +4,6 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"github.com/OnFinality-io/onf-cli/cmd/networkspec/payload"
-	"github.com/OnFinality-io/onf-cli/pkg/models"
-	"github.com/OnFinality-io/onf-cli/pkg/utils"
 	"io/ioutil"
 	"net/http/httputil"
 	"net/url"
@@ -14,6 +11,10 @@ import (
 	"sort"
 	"strings"
 	"time"
+
+	"github.com/OnFinality-io/onf-cli/cmd/networkspec/payload"
+	"github.com/OnFinality-io/onf-cli/pkg/models"
+	"github.com/OnFinality-io/onf-cli/pkg/utils"
 
 	"github.com/OnFinality-io/onf-cli/pkg/api"
 )
@@ -64,6 +65,26 @@ type NetworkSpec struct {
 	Recommend       *Recommend          `json:"recommend,omitempty"`
 	NodeTypes       []SpecNodeType      `json:"nodeTypes,omitempty"`
 	Config          *models.Config      `json:"config"`
+}
+
+type NetworkSpecBackups struct {
+	Key             	string              `json:"key" header:"Network Spec Key"`
+	Name            	string              `json:"name"`
+	DisplayName     	string              `json:"displayName" header:"Name"`
+	ProtocolKey     	string              `json:"protocolKey"`
+	AvailNodeTypes  	string     			`json:"availNodeTypes" header:"Node Type"`
+	MinStorageSize  	uint   				`json:"minStorageSize" header:"Min Storage Size (Gb)"`
+	AvailCloudRegion  	string     			`json:"availCloudRegion" header:"Cloud & Region"`
+	ClusterKey 			string     			`json:"cluserKey" header:"Cluster Key"`
+}
+
+type Backups struct {
+	Id				string		`json:"id"`
+	NetworkSpec		string		`json:"networkSpec"`
+	Protocol	    string		`json:"protocol"`
+	ClusterHash		string		`json:"clusterHash"`
+	StorageSize     uint		`json:"storageSize"`
+	PruningMode     string		`json:"pruningMode"`
 }
 
 func (c *NetworkSpec) MergeConfig(config *models.Config) {
@@ -143,6 +164,19 @@ func GetNetworkSpecs(wsID uint64) ([]NetworkSpec, error) {
 	resp, d, errs := instance.Ver2().Request(api.MethodGet, path, nil).EndStruct(&specs)
 	return specs, checkError(resp, d, errs)
 }
+
+func GetBackupNetworkSpecs() ([]NetworkSpecBackups, error) {
+	var specs []NetworkSpecBackups
+	resp, d, errs := instance.Ver2().Request(api.MethodGet, "/network-specs", nil).EndStruct(&specs)
+	return specs, checkError(resp, d, errs)
+}
+
+func GetBackups() ([]Backups, error) {
+	var backups []Backups
+	resp, d, errs := instance.Ver2().Request(api.MethodGet, "/backup", nil).EndStruct(&backups)
+	return backups, checkError(resp, d, errs)
+}
+
 func CreateNetworkSpecs(wsID uint64, payload *CreateNetworkSpecPayload) (*NetworkSpec, error) {
 	argumentSections, err := GetArgumentSectionsByProtocol(payload.Protocol)
 	if err != nil {

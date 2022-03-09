@@ -16,6 +16,7 @@ func NewCmd() *cobra.Command {
 
 	cmd.AddCommand(
 		listCmd(),
+		listBackupsCmd(),
 		CreateCmd(),
 		DeleteCmd(),
 		ShowCmd(),
