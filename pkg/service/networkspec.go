@@ -87,6 +87,24 @@ type Backups struct {
 	PruningMode     string		`json:"pruningMode"`
 }
 
+func (b Backups) GetNodeTypeFromPruningMode() string {
+	// TODO: find a way to get available pruning modes and protocols from APIs
+	switch strings.ToLower(b.PruningMode) {
+		case "archive":
+			if b.Protocol == "polkadot-parachain" {
+				return "archive | collator"
+			} else if b.Protocol == "substrate" {
+				return "archive | validator"
+			} else {
+				return "archive"
+			}
+		case "none":
+			return "full"
+		default:
+			return "-"
+	}
+}
+
 func (c *NetworkSpec) MergeConfig(config *models.Config) {
 	if c.Config == nil {
 		c.Config = config
