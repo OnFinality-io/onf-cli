@@ -105,6 +105,18 @@ func (b Backups) GetNodeTypeFromPruningModeAndProtocol() []string {
 	}
 }
 
+func (b Backups) GetNodeTypeFromPruningMode() []string {
+	switch strings.ToLower(b.PruningMode) {
+		case "archive":
+			return []string{"archive","validator","collator"}
+		case "none":
+			return []string{"full"}
+		default:
+			return []string{}
+	}
+}
+
+
 func (c *NetworkSpec) MergeConfig(config *models.Config) {
 	if c.Config == nil {
 		c.Config = config
