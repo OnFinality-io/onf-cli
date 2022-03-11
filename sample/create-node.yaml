@@ -1,8 +1,8 @@
 nodeName: cli-test-validator
-nodeType: validator # full or validator
+nodeType: validator # full, archive or validator/collator
 clusterKey: sy # available values: `onf info cluster`
 networkSpecKey:  # available values: `onf network-spec list`
-initFromBackup: true # works only with polkadot and kusama for now
+initFromBackup: true # use `onf network-spec list-backups` to get correct combinations for nodeType, clusterKey & networkSpecKey values
 publicPort: true
 useApiKey: true
 storage: 40Gi
