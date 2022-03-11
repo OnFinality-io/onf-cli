@@ -87,21 +87,21 @@ type Backups struct {
 	PruningMode     string		`json:"pruningMode"`
 }
 
-func (b Backups) GetNodeTypeFromPruningMode() string {
+func (b Backups) GetNodeTypeFromPruningModeAndProtocol() []string {
 	// TODO: find a way to get available pruning modes and protocols from APIs
 	switch strings.ToLower(b.PruningMode) {
 		case "archive":
 			if b.Protocol == "polkadot-parachain" {
-				return "archive | collator"
+				return []string{"archive","collator"}
 			} else if b.Protocol == "substrate" {
-				return "archive | validator"
+				return []string{"archive","validator"}
 			} else {
-				return "archive"
+				return []string{"archive"}
 			}
 		case "none":
-			return "full"
+			return []string{"full"}
 		default:
-			return "-"
+			return []string{}
 	}
 }
 

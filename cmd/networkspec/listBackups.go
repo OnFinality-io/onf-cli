@@ -52,15 +52,22 @@ func mapNetworkSpecBackups(
 ) []service.NetworkSpecBackups {
 	var (
 		nsBackups []service.NetworkSpecBackups
-		nodeTypes, cloudRegion string
+		cloudRegion, nodeTypeStr string
+		nodeTypes []string
 	)
 	for _, n := range ns {
 		for _, b := range nsb {
 			if n.Key == b.NetworkSpec { // filter out by networks with backups only
 				for _, c := range cl {
 					if b.ClusterHash == c.Hash && c.Active { // filter out by cluster key and active clusters
-						nodeTypes = b.GetNodeTypeFromPruningMode()
+						nodeTypes = b.GetNodeTypeFromPruningModeAndProtocol()
 						cloudRegion = strings.ToUpper(c.Cloud) + " - " + c.Region
+
+						if len(nodeTypes) > 0 {
+							nodeTypeStr = strings.Join(nodeTypes, " | ")
+						} else {
+							nodeTypeStr = "-"
+						}
 
 						nsBackups = append(nsBackups, service.NetworkSpecBackups{
 							Key: n.Key,
@@ -68,7 +75,7 @@ func mapNetworkSpecBackups(
 							DisplayName: n.DisplayName,
 							ProtocolKey: n.ProtocolKey,
 							MinStorageSize: b.StorageSize,
-							AvailNodeTypes: nodeTypes,
+							AvailNodeTypes: nodeTypeStr,
 							AvailCloudRegion: cloudRegion,
 							ClusterKey: c.Hash,
 						})
