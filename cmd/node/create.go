@@ -33,9 +33,12 @@ func createCmd() *cobra.Command {
 				fmt.Println(err.Error())
 				return
 			}
-			isBelowMinStorage, minStorageSize := isBackupStorageSizeBelow(payload)
-			if (isBelowMinStorage) {
-				fmt.Printf("Warning: Minimum %dGi required to use Lightning Restore/Backups\n", minStorageSize)
+
+			if payload.InitFromBackup { // skip this step if not initializing from backup
+				isBelowMinStorage, minStorageSize := isBackupStorageSizeBelow(payload)
+				if isBelowMinStorage {
+					fmt.Printf("Warning: Minimum %dGi required to use Lightning Restore/Backups\n", minStorageSize)
+				}
 			}
 			
 			// todo - filter out the minimum parameters can be put on the arguments instead of using a definition file
