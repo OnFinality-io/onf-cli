@@ -14,6 +14,11 @@ this CLI tool can help users to interact with OnFinality platform in developer p
 ```
 curl -s https://raw.githubusercontent.com/OnFinality-io/onf-cli/master/scripts/install/install.sh | bash
 ```
+#### Note:
+If you encountered a permission denied failure from the above command, please refer to the command below instead:
+```
+curl -s https://raw.githubusercontent.com/OnFinality-io/onf-cli/master/scripts/install/install.sh | sudo bash
+```
 
 ## For development
 
