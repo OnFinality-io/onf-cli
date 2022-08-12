@@ -75,6 +75,7 @@ func show(cmd *cobra.Command, printFlags *printer.PrintFlags) {
 	endpointsView := []propertyView{
 		{"HTTPs", node.Endpoints.RPC},
 		{"Websocket", node.Endpoints.WS},
+		{"Metrics", node.Endpoints.Metrics},
 	}
 	if printFlags.OutputFormat != nil && *printFlags.OutputFormat != "" {
 		outputView := &OutputView{Information: informationView, Endpoints: endpointsView}

@@ -9,6 +9,7 @@ type Endpoints struct {
 	WS          string `json:"ws"`
 	P2pInternal string `json:"p2p-internal"`
 	P2p         string `json:"p2p"`
+	Metrics     string `json:"metrics"`
 }
 
 type NodeItem struct {
