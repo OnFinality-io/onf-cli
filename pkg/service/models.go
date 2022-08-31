@@ -27,7 +27,7 @@ type Node struct {
 	NetworkSpecKey     string       `json:"networkSpecKey" header:"Network"`
 	WorkspaceID        uint64       `json:"workspaceId,string"`
 	OwnerID            uint64       `json:"ownerId,string"`
-	NodeType           string       `json:"nodeType"`
+	NodeType           string       `json:"type"`
 	NodeSpec           string       `json:"nodeSpec"`
 	CPU                string       `json:"cpu"`
 	Ram                string       `json:"ram"`
