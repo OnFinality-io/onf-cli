@@ -1,6 +1,6 @@
 #!/bin/sh
 export GOOS=darwin
-export GOARCH=$(uname -m)
+export GOARCH=amd64
 
 VERSION=$(cat VERSION)
 COMMIT=$(git rev-parse HEAD)
