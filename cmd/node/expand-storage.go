@@ -19,7 +19,7 @@ func expandStorageCmd() *cobra.Command {
 				fmt.Println(err.Error())
 				return
 			}
-			err = service.ExpandNodeStorage(wsID, nodeID, storageSize)
+			err = service.ExpandNodeStorage(wsID, nodeID, fmt.Sprintf("%dGi", storageSize))
 			if err != nil {
 				fmt.Println(err.Error())
 				return
