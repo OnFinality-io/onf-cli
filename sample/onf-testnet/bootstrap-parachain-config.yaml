@@ -1,31 +1,31 @@
 networkSpec:
-    displayName: Onf-Acala-testnet
-    name: onf-karura-testnet
-    protocol: polkadot-parachain
-    imageRepository: onfinality/acala
-    imageVersion: 1.4.1
-    config:
-      nodeTypes:
-        full:
-          args:
-            - key: "--force-authoring"
-            - key: --chain
-              file: "karura-dev-2000.json"
-            - key: --
-            - key: --chain
-              file: "rococo-local.json"
-            - key: --bootnodes # Relay chain p2p address
-              value: /dns4/node-6848832600444821504-0.p2p.onfinality.io/tcp/26568/p2p/12D3KooWHFdDmCuVL3SeytMpzTNuotAD7CwBjP799a35mCNyowLr
-        collator:
-          args:
-            - key: "--force-authoring"
-            - key: --chain
-              file: "karura-dev-2000.json"
-            - key: --
-            - key: --chain
-              file: "rococo-local.json"
-            - key: --bootnodes # Relay chain p2p address
-              value: /dns4/node-6848832600444821504-0.p2p.onfinality.io/tcp/26568/p2p/12D3KooWHFdDmCuVL3SeytMpzTNuotAD7CwBjP799a35mCNyowLr
+  displayName: Onf-Acala-testnet
+  name: onf-karura-testnet
+  protocol: polkadot-parachain
+  imageRepository: onfinality/acala
+  imageVersion: 1.4.1
+  config:
+    nodeTypes:
+      full:
+        args:
+          - key: "--force-authoring"
+          - key: --chain
+            file: "karura-dev-2000.json"
+          - key: --
+          - key: --chain
+            file: "rococo-local.json"
+          - key: --bootnodes # Relay chain p2p address
+            value: /dns4/node-6978182780370825216-0.p2p.onfinality.io/tcp/19734/p2p/12D3KooWDjCTD9j5r9U2op8EfeFTeBTGkdFEzSKzh8muz9fjMaRe
+      collator:
+        args:
+          - key: "--force-authoring"
+          - key: --chain
+            file: "karura-dev-2000.json"
+          - key: --
+          - key: --chain
+            file: "rococo-local.json"
+          - key: --bootnodes # Relay chain p2p address
+            value: /dns4/node-6978182780370825216-0.p2p.onfinality.io/tcp/19734/p2p/12D3KooWDjCTD9j5r9U2op8EfeFTeBTGkdFEzSKzh8muz9fjMaRe
 validator:
   count: 3
   sudoArgs:
