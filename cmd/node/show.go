@@ -61,16 +61,16 @@ func show(cmd *cobra.Command, printFlags *printer.PrintFlags) {
 		return
 	}
 	informationView := []propertyView{
-		{"ID:", node.ID},
-		{"Name:", node.Name},
-		{"Workspace:", node.WorkspaceID},
-		{"Owner:", node.OwnerID},
-		{"Cluster:", node.ClusterHash},
-		{"Network:", node.NetworkSpec.DisplayName},
-		{"Image:", node.Image},
-		{"Node Size:", fmt.Sprintf("%s (CPU: %s, RAM: %s)", node.NodeSpec, node.CPU, node.Ram)},
-		{"Storage Size:", node.Storage},
-		{"Status:", node.Status},
+		{"ID", node.ID},
+		{"Name", node.Name},
+		{"Workspace", node.WorkspaceID},
+		{"Owner", node.OwnerID},
+		{"Cluster", node.ClusterHash},
+		{"Network", node.NetworkSpec.DisplayName},
+		{"Image", node.Image},
+		{"Node Size", fmt.Sprintf("%s (CPU: %s, RAM: %s)", node.NodeSpec, node.CPU, node.Ram)},
+		{"Storage Size", node.Storage},
+		{"Status", node.Status},
 	}
 	endpointsView := []propertyView{
 		{"HTTPs", node.Endpoints.RPC},
