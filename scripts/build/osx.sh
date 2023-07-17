@@ -2,7 +2,7 @@
 export GOOS=darwin
 ARCH=$(arch)
 # Apple no longer support 32bit apps, so as Go 1.15+
-if [ "$ARCH" = "i386" ]; then
+if [[ "$ARCH" == "i386" ]]; then
   ARCH="amd64"
 fi
 export GOARCH="$ARCH"

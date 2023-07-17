@@ -1,4 +1,5 @@
 .idea
 build
+!./scripts/build
 .DS_Store
 onf-cli
