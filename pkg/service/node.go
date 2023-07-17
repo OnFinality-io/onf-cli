@@ -2,6 +2,7 @@ package service
 
 import (
 	"fmt"
+
 	"github.com/OnFinality-io/onf-cli/pkg/api"
 	"k8s.io/apimachinery/pkg/api/resource"
 )
@@ -13,9 +14,14 @@ func GetNodeList(wsID uint64) ([]NodeItem, error) {
 	return nodes, checkError(resp, d, errs)
 }
 
-func GetNodeDetail(wsID uint64, nodeID uint64) (*Node, error) {
+func GetNodeDetail(wsID uint64, nodeID uint64, extrasFlag ...int) (*Node, error) {
+	// refer to mx-api for the available flags, flags = 1 means load endpoints
+	flags := 1
+	if len(extrasFlag) > 0 {
+		flags = extrasFlag[0]
+	}
 	node := Node{}
-	path := fmt.Sprintf("/workspaces/%d/nodes/%d", wsID, nodeID)
+	path := fmt.Sprintf("/workspaces/%d/nodes/%d?extrasFlag=%d", wsID, nodeID, flags)
 	resp, d, errs := instance.Request(api.MethodGet, path, nil).EndStruct(&node)
 	return &node, checkError(resp, d, errs)
 }

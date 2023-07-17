@@ -55,7 +55,7 @@ func show(cmd *cobra.Command, printFlags *printer.PrintFlags) {
 		fmt.Println(err.Error())
 		return
 	}
-	node, err := service.GetNodeDetail(wsID, nodeID)
+	node, err := service.GetNodeDetail(wsID, nodeID, *printFlags.Extras)
 	if err != nil {
 		fmt.Println(err.Error())
 		return
