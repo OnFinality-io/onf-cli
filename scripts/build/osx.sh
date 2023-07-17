@@ -1,6 +1,11 @@
 #!/bin/sh
 export GOOS=darwin
-export GOARCH="$(arch)"
+ARCH=$(arch)
+# Apple no longer support 32bit apps, so as Go 1.15+
+if [ "$ARCH" = "i386" ]; then
+  ARCH="amd64"
+fi
+export GOARCH="$ARCH"
 
 VERSION=$(cat VERSION)
 COMMIT=$(git rev-parse HEAD)
